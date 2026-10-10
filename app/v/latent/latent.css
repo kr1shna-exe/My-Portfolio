@@ -1087,7 +1087,7 @@ a.latent-glass-url:hover {
 }
 .latent-fp-shot {
   justify-self: end;
-  width: min(100%, calc(40vh * 1.6));
+  width: min(100%, calc(36vh * 1.6));
 }
 .latent-net {
   position: relative;
@@ -1138,33 +1138,42 @@ a.latent-glass-url:hover {
 .latent-stages {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 14px;
+  gap: 0 6px;
+  margin-top: 18px;
 }
 .latent-stages li {
   display: grid;
-  justify-items: center;
-  text-align: center;
-  gap: 5px;
-  opacity: calc(0.3 + var(--a) * 0.7);
-  transform: translateY(calc((1 - var(--a)) * 10px));
+  align-content: start;
+  gap: 6px;
+  padding-right: 14px;
 }
-.latent-stage-n {
-  font-size: 10.5px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--cream) calc(var(--a) * 100%), rgba(245, 243, 236, 0.1));
-  color: color-mix(in oklab, var(--ink) calc(var(--a) * 100%), var(--cream));
+/* One segmented bar under the network: each stage fills in turn as the
+   pass reaches it, like a job working through its steps. */
+.latent-stage-bar {
+  display: block;
+  height: 3px;
+  margin-bottom: 8px;
+  background: rgba(245, 243, 236, 0.12);
+  overflow: hidden;
+}
+.latent-stage-bar i {
+  display: block;
+  height: 100%;
+  background: var(--cream);
+  transform-origin: left;
+  transform: scaleX(var(--a));
 }
 .latent-stages b {
   font: 600 clamp(14px, 1.2vw, 17px)/1.15 var(--display);
   letter-spacing: -0.01em;
+  color: color-mix(in oklab, var(--cream) calc(45% + var(--a) * 55%), transparent);
 }
 .latent-stage-d {
   font-size: 13px;
-  line-height: 1.35;
+  line-height: 1.4;
   color: var(--g2);
-  max-width: 24ch;
+  max-width: 26ch;
+  opacity: calc(0.45 + var(--a) * 0.55);
 }
 .latent-fp-progress {
   position: absolute;
@@ -1226,19 +1235,10 @@ a.latent-glass-url:hover {
 @media (max-width: 899px) {
   .latent-stages {
     grid-template-columns: minmax(0, 1fr);
-    gap: 14px;
+    gap: 18px;
   }
   .latent-stages li {
-    grid-template-columns: 44px minmax(0, 1fr);
-    justify-items: start;
-    text-align: left;
-    gap: 2px 12px;
-    transform: translateX(calc((1 - var(--a)) * -10px));
-  }
-  .latent-stage-n {
-    grid-row: span 2;
-    align-self: start;
-    margin-top: 2px;
+    padding-right: 0;
   }
   .latent-stage-d {
     max-width: none;
@@ -1311,7 +1311,7 @@ a.latent-glass-url:hover {
 }
 .latent-os-stats {
   display: grid;
-  grid-template-columns: 1.3fr repeat(5, minmax(0, 1fr));
+  grid-template-columns: 1.3fr repeat(4, minmax(0, 1fr));
   border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--line-l);
 }
@@ -1540,7 +1540,7 @@ a.latent-glass-url:hover {
 }
 .latent-row {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px 22px;
   padding: 15px 0;
   border-bottom: 1px solid rgba(15, 15, 14, 0.07);
@@ -1870,7 +1870,7 @@ a.latent-glass-url:hover {
     bottom: 76px;
   }
   .latent-os-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .latent-os-stats .latent-os-stat-hero {
     grid-column: 1 / -1;
@@ -1930,8 +1930,8 @@ a.latent-glass-url:hover {
   .latent-os-stats div {
     padding: 14px 14px 16px;
   }
-  .latent-os-stats div:last-child {
-    grid-column: 1 / -1;
+  .latent-os-stats div:nth-child(2n) {
+    border-left: 0;
   }
   .latent-osp {
     min-height: 0;
@@ -1940,15 +1940,11 @@ a.latent-glass-url:hover {
     font-size: 46px;
   }
   .latent-row {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  .latent-row-main {
-    grid-column: 1 / -1;
-    grid-row: 2;
+    grid-template-columns: minmax(0, 1fr);
   }
   .latent-row-diff {
-    grid-column: 2;
-    grid-row: 1;
+    justify-items: start;
+    justify-content: start;
     grid-auto-flow: column;
     align-items: center;
     gap: 10px;

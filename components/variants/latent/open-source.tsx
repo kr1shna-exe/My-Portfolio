@@ -4,27 +4,18 @@ import { useState } from "react";
 
 import {
   contributionStats as stats,
-  contributions,
   contributionsByRepo,
   type Contribution,
 } from "@/data/open-source";
 
 /* Upstream pull requests. Leads with the numbers, then the six projects as
-   big sticker cards, a merge histogram, and every PR grouped by project. */
+   cards, and every PR grouped by project. No dates on purpose. */
 
 const TONES = ["#0a0a0a", "#3d3c39", "#64625d", "#8b8881", "#b1aea5", "#d6d3ca"];
 const toneOf = (repo: string) =>
   TONES[Math.max(0, contributionsByRepo.findIndex((r) => r.repo === repo)) % TONES.length];
 export const repoSlug = (name: string) => `oss-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
-const DAY = 86_400_000;
-const utc = (iso: string) => Date.parse(`${iso}T00:00:00Z`);
-const fmt = (iso: string, opts: Intl.DateTimeFormatOptions) =>
-  new Date(utc(iso)).toLocaleDateString("en-US", { timeZone: "UTC", ...opts });
-const SPAN_DAYS = Math.round((utc(stats.latest) - utc(stats.since)) / DAY) + 1;
-const DAYS = Array.from({ length: SPAN_DAYS }, (_, i) =>
-  new Date(utc(stats.since) + i * DAY).toISOString().slice(0, 10)
-);
 const n = (v: number) => v.toLocaleString("en-US");
 const COLLAPSE_AT = 4;
 
@@ -43,8 +34,8 @@ export function OpenSource() {
           </div>
           <div className="latent-os-side">
             <p className="latent-lede">
-              {nameList}. All merged between {fmt(stats.since, { month: "short", day: "numeric" })} and{" "}
-              {fmt(stats.latest, { month: "short", day: "numeric", year: "numeric" })}.
+              {nameList}. Every one is merged and linked below, so you can read the code
+              review as well as the code.
             </p>
           </div>
         </header>
@@ -70,21 +61,12 @@ export function OpenSource() {
             <dt>files changed</dt>
             <dd>{stats.files}</dd>
           </div>
-          <div>
-            <dt>merged within</dt>
-            <dd>
-              {SPAN_DAYS}
-              <small> days</small>
-            </dd>
-          </div>
         </dl>
-
-        <Histogram />
 
         <ul className="latent-osp-grid" aria-label="Projects">
           {contributionsByRepo.map((r, i) => (
             <li key={r.repo} data-reveal style={{ transitionDelay: `${(i % 3) * 70}ms` }}>
-              <ProjectCard repo={r} i={i} />
+              <ProjectCard repo={r} />
             </li>
           ))}
         </ul>
@@ -100,37 +82,9 @@ export function OpenSource() {
   );
 }
 
-function Histogram() {
-  const byDay = DAYS.map((d) => contributions.filter((c) => c.date === d));
-  return (
-    <figure className="latent-hist" data-reveal>
-      <div className="latent-hist-cols" role="img" aria-label={`Merged PRs per day from ${DAYS[0]} to ${DAYS[DAYS.length - 1]}`}>
-        {byDay.map((prs, i) => (
-          <div key={DAYS[i]} className="latent-hist-col">
-            <div className="latent-hist-stack">
-              {prs.map((c) => (
-                <i key={c.number} style={{ background: toneOf(c.repo) }} title={`${c.repo} #${c.number}`} />
-              ))}
-            </div>
-            <span className="latent-mono">{fmt(DAYS[i], { month: "short", day: "numeric" })}</span>
-          </div>
-        ))}
-      </div>
-      <figcaption className="latent-hist-legend latent-mono">
-        <span>Merged per day</span>
-        {contributionsByRepo.map((r) => (
-          <span key={r.repo}>
-            <i style={{ background: toneOf(r.repo) }} aria-hidden /> {r.name}
-          </span>
-        ))}
-      </figcaption>
-    </figure>
-  );
-}
-
 type Repo = (typeof contributionsByRepo)[number];
 
-function ProjectCard({ repo, i }: { repo: Repo; i: number }) {
+function ProjectCard({ repo }: { repo: Repo }) {
   const add = repo.prs.reduce((a, c) => a + c.additions, 0);
   const del = repo.prs.reduce((a, c) => a + c.deletions, 0);
   return (
@@ -140,7 +94,6 @@ function ProjectCard({ repo, i }: { repo: Repo; i: number }) {
       aria-label={`${repo.name}: ${repo.prs.length} merged pull requests. Jump to the list.`}
     >
       <span className="latent-osp-top latent-mono">
-        <span>{String(i + 1).padStart(2, "0")}</span>
         <span>{repo.repo}</span>
       </span>
       <span className="latent-osp-name">{repo.name}</span>
@@ -203,9 +156,6 @@ function PrRow({ c }: { c: Contribution }) {
   const greens = Math.round((c.additions / total) * 10);
   return (
     <li className="latent-row">
-      <span className="latent-row-date latent-mono">
-        {fmt(c.date, { month: "short", day: "numeric" })}
-      </span>
       <div className="latent-row-main">
         <a href={c.url} target="_blank" rel="noreferrer" className="latent-row-title">
           {c.title}

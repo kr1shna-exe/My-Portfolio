@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type PointerEvent } from "react";
 
 import { pad } from "./data";
 
@@ -13,13 +13,26 @@ export type LedgerRow = {
   files: number;
   additions: number;
   deletions: number;
-  date: string;
   addV: number;
   delV: number;
 };
 
 const COLLAPSE_OVER = 5;
 const SHOW = 4;
+
+/* Ink follows the pointer: it pours in from the edge the pointer crossed and
+   drains out the edge it leaves by, so moving down the list reads as one
+   continuous downward motion. */
+const edgeOf = (e: PointerEvent<HTMLElement>) => {
+  const r = e.currentTarget.getBoundingClientRect();
+  return e.clientY < r.top + r.height / 2 ? "top" : "bottom";
+};
+const onRowEnter = (e: PointerEvent<HTMLTableRowElement>) => {
+  e.currentTarget.dataset.edge = edgeOf(e);
+};
+const onRowLeave = (e: PointerEvent<HTMLTableRowElement>) => {
+  e.currentTarget.dataset.edge = edgeOf(e);
+};
 
 /* One project's block in the ledger: a ruled group header, then its PRs.
    Long groups fold to the newest four behind a "show all" row. */
@@ -60,7 +73,7 @@ export function LedgerGroup({
         </th>
       </tr>
       {visible.map((r, i) => (
-        <tr key={r.key} className="index-trow">
+        <tr key={r.key} className="index-trow" onPointerEnter={onRowEnter} onPointerLeave={onRowLeave}>
           <td className="index-t-no">{pad(i + 1)}</td>
           <td className="index-t-pr">
             <a href={r.url} target="_blank" rel="noreferrer" className="index-stretch-row">
@@ -84,7 +97,6 @@ export function LedgerGroup({
           </td>
           <td className="index-num index-t-state">
             <span className="index-state-m">Merged</span>
-            <span className="index-t-sub">{r.date}</span>
           </td>
         </tr>
       ))}

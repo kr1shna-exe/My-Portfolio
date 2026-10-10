@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 
 import { contributionStats } from "@/data/open-source";
 
-import { featured, liveCount, pad, repoCount, site } from "./data";
+import { featured, liveCount, repoCount, site } from "./data";
 import { GlassFrame } from "./glass-frame";
 
 const NAME = "KRISHNA".split("");
@@ -209,13 +209,12 @@ export function IndexHero() {
 
       <nav className="index-inside" aria-label="Featured work">
         <span className="index-inside-label">Featured</span>
-        {featured.map((p, i) => (
+        {featured.map((p) => (
           <a key={p.slug} href={`#sheet-${p.slug}`} className="index-inside-item">
             <GlassFrame label={p.title} size="mini" className="index-inside-thumb">
               <Image src={p.image} alt="" fill sizes="110px" className="index-cover" />
             </GlassFrame>
             <span className="index-inside-text">
-              <span className="index-inside-no">{pad(i + 1)}</span>
               <span className="index-inside-title">{p.title}</span>
             </span>
             <span aria-hidden className="index-inside-arrow">↓</span>

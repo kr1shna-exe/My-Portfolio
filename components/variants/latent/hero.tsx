@@ -41,7 +41,7 @@ export function LatentHero() {
       centerY: (w, h) => (w < 768 ? 0.27 : h < 760 ? 0.32 : 0.35),
       maxW: 0.9,
       maxH: small ? 0.2 : 0.36,
-      duration: 2800,
+      duration: 1100,
       brush: small ? 60 : 95,
     });
 

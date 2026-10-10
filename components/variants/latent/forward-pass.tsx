@@ -52,7 +52,7 @@ const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t 
 
 const LAYERS = [3, 4, 5, 4, 2];
 const COL_X = (i: number) => 100 + i * 200;
-const NODE_Y = (n: number, j: number) => 85 + (j - (n - 1) / 2) * 34;
+const NODE_Y = (n: number, j: number) => 62 + (j - (n - 1) / 2) * 26;
 
 export function ForwardPass() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -138,9 +138,6 @@ function Panel({
       <div className="latent-fp-top">
         <div className="latent-fp-copy">
           <p className="latent-mono latent-fp-k">
-            <span>
-              {String(index + 1).padStart(2, "0")} / {String(featured.length).padStart(2, "0")}
-            </span>
             {anatomy.title}
           </p>
           <h3 id={`latent-fp-${project.slug}`} className="latent-fp-title">
@@ -180,7 +177,7 @@ function Panel({
       </div>
 
       <div className="latent-net">
-        <svg viewBox="0 0 1000 170" preserveAspectRatio="xMidYMid meet" className="latent-net-svg" aria-hidden>
+        <svg viewBox="0 0 1000 124" preserveAspectRatio="xMidYMid meet" className="latent-net-svg" aria-hidden>
           {LAYERS.slice(0, -1).map((n, i) => {
             const m = LAYERS[i + 1];
             return (
@@ -215,17 +212,19 @@ function Panel({
             <g key={`l${i}`} className="latent-net-layer" style={{ ["--i" as string]: i }}>
               {Array.from({ length: n }, (_, j) => (
                 <g key={j}>
-                  <circle className="latent-net-halo" cx={COL_X(i)} cy={NODE_Y(n, j)} r={17} />
-                  <circle className="latent-net-node" cx={COL_X(i)} cy={NODE_Y(n, j)} r={8} />
+                  <circle className="latent-net-halo" cx={COL_X(i)} cy={NODE_Y(n, j)} r={13} />
+                  <circle className="latent-net-node" cx={COL_X(i)} cy={NODE_Y(n, j)} r={6.5} />
                 </g>
               ))}
             </g>
           ))}
         </svg>
-        <ol className="latent-stages">
+        <ol className="latent-stages" aria-label="How it works">
           {anatomy.stages.map((s, i) => (
             <li key={s.name} style={{ ["--i" as string]: i }}>
-              <span className="latent-mono latent-stage-n">{String(i + 1).padStart(2, "0")}</span>
+              <span className="latent-stage-bar" aria-hidden>
+                <i />
+              </span>
               <b>{s.name}</b>
               <span className="latent-stage-d">{s.desc}</span>
             </li>

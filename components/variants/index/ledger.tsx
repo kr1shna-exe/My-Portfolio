@@ -1,13 +1,8 @@
 import { contributionsByRepo, contributionStats } from "@/data/open-source";
 
-import { formatDate } from "./data";
 import { InView } from "./in-view";
 import { LedgerGroup, type LedgerRow } from "./ledger-group";
 import { Tally } from "./tally";
-
-const DAY = 86_400_000;
-const daysBetween = (a: string, b: string) =>
-  Math.round((Date.parse(b) - Date.parse(a)) / DAY) + 1;
 
 export const slugOf = (repo: string) => `oss-${repo.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
 
@@ -17,7 +12,7 @@ export const slugOf = (repo: string) => `oss-${repo.replace(/[^a-z0-9]+/gi, "-")
    pull request to someone else's repo. */
 export function Ledger() {
   const s = contributionStats;
-  const days = daysBetween(s.since, s.latest);
+  const largest = Math.max(...contributionsByRepo.flatMap((g) => g.prs.map((p) => p.additions)));
   const maxLines = Math.max(
     1,
     ...contributionsByRepo.flatMap((g) => g.prs.map((p) => Math.max(p.additions, p.deletions)))
@@ -31,8 +26,8 @@ export function Ledger() {
           <span className="index-tally-label">Merged pull requests</span>
           <Tally value={s.merged} pad className="index-tally-big" />
           <p className="index-tally-dek">
-            To {s.repos} open-source AI and developer-tool projects, from {formatDate(s.since)} to{" "}
-            {formatDate(s.latest)}.
+            Into {s.repos} open-source AI and developer-tool projects. Every row below links to the
+            pull request itself.
           </p>
         </div>
         <div className="index-tally-side">
@@ -43,9 +38,9 @@ export function Ledger() {
             </span>
           </div>
           <div>
-            <span className="index-tally-label">Time span</span>
+            <span className="index-tally-label">Largest PR</span>
             <span className="index-tally-fig">
-              <Tally value={days} /> days
+              +<Tally value={largest} />
             </span>
           </div>
           <div>
@@ -107,7 +102,7 @@ export function Ledger() {
       <div className="index-ledger-wrap">
         <table className="index-table">
           <caption className="index-sr">
-            Every merged pull request, grouped by project, newest first within each
+            Every merged pull request, grouped by project
           </caption>
           <thead>
             <tr>
@@ -118,7 +113,7 @@ export function Ledger() {
               </th>
               <th scope="col">Change +/−</th>
               <th scope="col" className="index-num">
-                Merged
+                Status
               </th>
             </tr>
           </thead>
@@ -134,7 +129,6 @@ export function Ledger() {
                 files: p.files,
                 additions: p.additions,
                 deletions: p.deletions,
-                date: formatDate(p.date),
                 addV: p.additions / maxLines,
                 delV: p.deletions / maxLines,
               }));

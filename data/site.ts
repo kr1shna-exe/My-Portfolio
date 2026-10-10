@@ -38,6 +38,7 @@ const TAGLINES: Record<string, string> = {
   n8n: "A self-hosted n8n, built from scratch. Drag nodes, wire services, let it run.",
   exness: "Real-time crypto trading: live prices, candlesticks on every timeframe, leverage.",
   trimfit: "Paste a job description, get back the resume that gets the interview.",
+  twisense: "Reads the emotion behind a single tweet.",
 };
 
 export type ShowcaseProject = Project & { liveUrl?: string; featured: boolean };
@@ -67,7 +68,7 @@ export const VARIANTS = [
   {
     slug: "index",
     name: "Index",
-    pitch: "Broadsheet at poster scale: type does all the talking.",
-    feel: "Paper and ink, giant Archivo, ink-flood rows",
+    pitch: "Big type on paper, with every project in its own browser frame.",
+    feel: "Paper and ink, a work index, stacked project sheets",
   },
 ] as const;

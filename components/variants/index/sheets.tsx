@@ -7,7 +7,7 @@ import { useRef, useSyncExternalStore, type RefObject } from "react";
 
 import { cn } from "@/lib/utils";
 
-import { anatomies, featured, isLive, pad } from "./data";
+import { anatomies, featured, isLive } from "./data";
 import { GlassFrame } from "./glass-frame";
 import { InView } from "./in-view";
 
@@ -39,9 +39,8 @@ function Pipeline({ slug }: { slug: string }) {
         {a.stages.map((s, i) => (
           <li key={s.name} className="index-pipe-stage" style={{ "--i": i } as React.CSSProperties}>
             <span className="index-pipe-rule" aria-hidden>
-              {i < a.stages.length - 1 && <span className="index-pipe-arrow">→</span>}
+              <i />
             </span>
-            <span className="index-pipe-n">{pad(i + 1)}</span>
             <span className="index-pipe-name">{s.name}</span>
             <span className="index-pipe-desc">{s.desc}</span>
           </li>
@@ -85,9 +84,7 @@ function Sheet({
     >
       <div className="index-sheet-inner">
         <div className="index-sheet-bar">
-          <span>
-            {pad(i + 1)} / {pad(featured.length)}
-          </span>
+          <span>{anatomies[p.slug]?.title ?? "Featured project"}</span>
           <span>
             {isLive(p) ? (
               <>
@@ -121,9 +118,6 @@ function Sheet({
                 Case study <span aria-hidden>→</span>
               </Link>
             </div>
-            <span className="index-sheet-num" aria-hidden>
-              {pad(i + 1)}
-            </span>
           </div>
           <a
             href={p.liveUrl ?? `/projects/${p.slug}`}

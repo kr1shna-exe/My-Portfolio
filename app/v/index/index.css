@@ -406,11 +406,13 @@ body:has([data-variant="index"]) {
     0 40px 80px -30px rgba(0, 0, 0, 0.8);
 }
 .index-glass-bar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 4px 6px 9px;
   min-width: 0;
+  min-height: 34px;
 }
 .index-glass-dots { display: flex; gap: 6px; flex: none; }
 .index-glass-dots i {
@@ -420,10 +422,11 @@ body:has([data-variant="index"]) {
   background: var(--g-dot);
 }
 .index-glass-url {
-  flex: 1;
-  min-width: 0;
-  max-width: 340px;
-  margin: 0 auto;
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  transform: translateX(-50%);
+  width: min(340px, calc(100% - 140px));
   padding: 5px 12px;
   border-radius: 8px;
   background: var(--g-pill);
@@ -434,7 +437,6 @@ body:has([data-variant="index"]) {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.index-glass-dots + .index-glass-url { margin-right: calc(48px); }
 .index-glass-view {
   position: relative;
   flex: 1;
@@ -699,6 +701,9 @@ body:has([data-variant="index"]) {
   height: calc(100dvh - 52px);
   box-shadow: 0 -24px 60px rgba(23, 21, 15, 0.1);
 }
+/* Each sheet holds still, fully visible, for a stretch of scroll before the
+   next one slides over it. */
+.index-sheet.is-sticky:not(:last-child) { margin-bottom: 45vh; }
 .index-sheet-ink {
   background: var(--ix-ink);
   color: var(--ix-paper);
@@ -764,18 +769,6 @@ body:has([data-variant="index"]) {
   font: 400 0.76rem/1.5 var(--ix-mono);
   color: var(--ix-muted);
 }
-.index-sheet-num {
-  margin-top: auto;
-  font-size: min(15rem, 46cqw, 24vh);
-  line-height: 0.74;
-  font-weight: 860;
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--ix-ink);
-  font-variation-settings: "wdth" 62;
-  transition: font-variation-settings 1.2s var(--ix-ease);
-  margin-bottom: -0.04em;
-}
-.index-sheet:hover .index-sheet-num { font-variation-settings: "wdth" 125; }
 .index-sheet-links {
   padding-top: 22px;
   display: flex;
@@ -812,8 +805,10 @@ body:has([data-variant="index"]) {
   padding: 0;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0 clamp(10px, 1.4vw, 22px);
+  gap: 0 4px;
 }
+.index-pipe-name,
+.index-pipe-desc { padding-right: clamp(10px, 1.4vw, 22px); }
 .index-pipe-stage {
   display: grid;
   grid-template-rows: auto auto auto 1fr;
@@ -821,37 +816,24 @@ body:has([data-variant="index"]) {
   position: relative;
   padding-bottom: 2px;
 }
+/* One segmented progress bar across the five stages; each segment fills in
+   turn when the sheet comes into view. */
 .index-pipe-rule {
   display: block;
-  height: 3px;
+  height: 4px;
+  margin-bottom: 10px;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  overflow: hidden;
+}
+.index-pipe-rule i {
+  display: block;
+  height: 100%;
   background: currentColor;
-  position: relative;
-  margin-bottom: 8px;
   transform-origin: left;
   transform: scaleX(0);
-  transition: transform 0.9s var(--ix-ease);
-  transition-delay: calc(var(--i) * 0.14s);
+  transition: transform 0.7s cubic-bezier(0.45, 0, 0.2, 1);
+  transition-delay: calc(0.1s + var(--i) * 0.6s);
 }
-.index-pipe-arrow {
-  position: absolute;
-  right: calc(-1 * clamp(10px, 1.4vw, 22px) - 2px);
-  top: 50%;
-  transform: translate(50%, -52%);
-  font: 400 1rem/1 var(--ix-mono);
-  background: inherit;
-  padding: 0 2px;
-  z-index: 1;
-}
-.index-sheet .index-pipe-arrow { background: var(--ix-sheet); }
-.index-sheet-ink .index-pipe-arrow { background: var(--ix-ink); }
-.index-pipe-n {
-  font-size: clamp(2rem, 3.4vw, 3.6rem);
-  line-height: 0.85;
-  font-weight: 800;
-  font-variation-settings: "wdth" 62;
-  transition: font-variation-settings 0.6s var(--ix-ease);
-}
-.index-pipe-stage:hover .index-pipe-n { font-variation-settings: "wdth" 125; }
 .index-pipe-name {
   font-weight: 650;
   font-size: clamp(0.95rem, 1.1vw, 1.1rem);
@@ -862,43 +844,28 @@ body:has([data-variant="index"]) {
   font: 400 0.72rem/1.4 var(--ix-mono);
   color: var(--ix-muted);
 }
-.index-pipe-n,
 .index-pipe-name,
 .index-pipe-desc {
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.6s, transform 0.8s var(--ix-ease), font-variation-settings 0.6s var(--ix-ease);
-  transition-delay: calc(0.15s + var(--i) * 0.14s);
+  transition-delay: calc(0.3s + var(--i) * 0.6s);
 }
-.index-pipe.is-in .index-pipe-rule { transform: scaleX(1); }
-.index-pipe.is-in .index-pipe-n,
+.index-pipe.is-in .index-pipe-rule i { transform: scaleX(1); }
 .index-pipe.is-in .index-pipe-name,
 .index-pipe.is-in .index-pipe-desc { opacity: 1; transform: none; }
-.index-pipe.is-in .index-pipe-stage:hover .index-pipe-n { transition-delay: 0s; }
 
 @media (max-width: 1023px) {
   .index-sheet-grid { grid-template-columns: 1fr; }
   .index-sheet-shot { order: -1; }
   .index-sheet-shot .index-glass-view { flex: none; aspect-ratio: 16 / 10; }
   .index-sheet-inner { padding-bottom: 48px; }
-  .index-sheet-num { display: none; }
 }
 @media (max-width: 700px) {
   .index-pipe-list { grid-template-columns: 1fr; }
-  .index-pipe-stage {
-    grid-template-columns: 64px minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    column-gap: 14px;
-    padding: 12px 0 14px;
-    border-top: 0;
-  }
-  .index-pipe-rule {
-    grid-column: 1 / -1;
-    height: 2px;
-    margin: 0 0 8px;
-  }
-  .index-pipe-arrow { display: none; }
-  .index-pipe-n { grid-row: 2 / span 2; font-size: 2.6rem; }
+  .index-pipe-list { gap: 0; }
+  .index-pipe-stage { padding: 10px 0 12px; }
+  .index-pipe-rule { margin: 0 0 8px; }
   .index-pipe-name { margin-top: 0; }
 }
 
@@ -976,10 +943,10 @@ body:has([data-variant="index"]) {
 .index-table td:last-child { padding-right: 10px; }
 .index-trow {
   position: relative;
-  transition: color 0.3s var(--ix-ease);
-  background: linear-gradient(var(--ix-ink), var(--ix-ink)) 0 100% / 100% 0% no-repeat;
-  transition: background-size 0.45s var(--ix-ease), color 0.3s;
+  background: linear-gradient(var(--ix-ink), var(--ix-ink)) 0 0 / 100% 0% no-repeat;
+  transition: background-size 0.35s var(--ix-ease), color 0.25s;
 }
+.index-trow[data-edge="bottom"] { background-position: 0 100%; }
 .index-trow:hover,
 .index-trow:focus-within {
   background-size: 100% 100%;
@@ -1000,7 +967,7 @@ body:has([data-variant="index"]) {
 .index-t-pr a:focus-visible { outline: none; }
 .index-trow:has(a:focus-visible) { outline: 2px solid var(--ix-ink); outline-offset: 2px; }
 .index-t-prnum { font: 400 0.82rem/1 var(--ix-mono); color: var(--ix-muted); }
-.index-t-pr .index-diff {
+.index-t-diff .index-diff {
   display: flex;
   gap: 10px;
   font: 400 0.82rem/1.4 var(--ix-mono);
@@ -1517,7 +1484,6 @@ body:has([data-variant="index"]) {
     transition-delay: 0s !important;
   }
 }
-.index-sheet-ink .index-sheet-num { -webkit-text-stroke-color: var(--ix-paper); }
 .index-tally-word { font-size: clamp(1.5rem, 2.6vw, 2.6rem); white-space: nowrap; padding-top: 0.3em; }
 .index-dateline-links { display: flex; gap: clamp(12px, 2vw, 24px); }
 .index-dateline-links a:hover { color: var(--ix-ink); }

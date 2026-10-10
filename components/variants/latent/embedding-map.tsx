@@ -227,9 +227,8 @@ export function EmbeddingMap() {
 
             </div>
             <p className="latent-footnote latent-mono">
-              Placed by hand, not computed. Closeness is distance on this map. Roles sit between the
-              groups their work touched; open-source points are sized by merged PRs. Arrow keys move
-              the selection.
+              Bigger open-source points mean more merged pull requests. Arrow keys move between
+              points.
             </p>
           </div>
 
@@ -268,7 +267,7 @@ export function EmbeddingMap() {
             ))}
           </div>
           <p className="latent-footnote latent-mono">
-            Grouped by hand. Closeness is distance on the desktop map.
+            Grouped by the kind of problem each one solves.
           </p>
         </div>
       </div>
