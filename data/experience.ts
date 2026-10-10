@@ -29,7 +29,7 @@ export const experience: ExperienceItem[] = [
     end: "Feb 2025",
     location: "Remote",
     summary:
-      "Produced ApeHR’s marketing experience so prospects can see-in one scroll-how the platform turns manual hiring into an automated, insight-led workflow.",
+      "Produced ApeHR’s marketing experience so prospects can see, in one scroll, how the platform turns manual hiring into an automated, insight-led workflow.",
     link: "https://acetrumpets.vercel.app",
     highlights: [
       "Translated stakeholder research into interactive KPI stories (survey stats, hiring funnels, ATS benchmarks) ",

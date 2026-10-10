@@ -1,97 +1,156 @@
+/* Hallmark · system: bespoke "Broadsheet" (sheet-stack editorial) · locked by
+   owner decisions, 2026-07 · paper/ink monochrome · Archivo variable (wdth) +
+   Spline Sans Mono · do not rotate themes or macrostructures — polish within
+   the system only. */
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
-  --background: #050505;
-  --foreground: #f7f5f2;
-  --surface: #0f0f11;
-  --muted: #a3a3ad;
-  --border: rgba(255, 255, 255, 0.08);
-  --accent: #f7f5f2;
+  color-scheme: light;
+  --paper: #edebe7;
+  --sheet: #f4f2ee;
+  --ink: #17150f;
+  --muted: #6e6a61;
+  --line: rgba(23, 21, 15, 0.14);
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-strong: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-archivo);
+  --font-mono: var(--font-spline-mono);
 }
 
 * {
-  border-color: var(--border);
+  border-color: var(--line);
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
-  min-height: 100vh;
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    var(--font-geist-sans),
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  overflow-x: clip;
+  min-height: 100dvh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-archivo), system-ui, sans-serif;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
 }
 
 [data-nav-section] {
-  scroll-margin-top: 140px;
+  scroll-margin-top: 72px;
 }
 
-@layer base {
-  ::selection {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  *:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+/* Hero letters read their width axis from a CSS variable so motion
+   values can drive it without re-rendering React. */
+.axis-letter {
+  font-variation-settings: "wdth" var(--wdth, 125);
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
 
-  .section-heading {
-    position: relative;
-    font-family: var(--font-playfair), "Playfair Display", ui-serif, serif;
-    letter-spacing: -0.01em;
-    font-weight: 600;
+/* Ink underline that draws in from the left on hover and leaves to the
+   right, so repeated passes feel directional instead of toggled. */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.32s var(--ease-out-strong);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after,
+.link-underline.is-active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-underline::after {
+    transition: none;
   }
+}
 
-  .section-heading::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -6px;
-    width: 120px;
-    height: 2px;
-    background: linear-gradient(90deg, currentColor, transparent);
-    opacity: 0.45;
+/* Sibling dimming across the whole masthead: hovering any nav link eases
+   every other link back, on both sides of the wordmark. Attention by
+   subtraction; asymmetric timing (fast in, slower out). */
+.nav-item {
+  opacity: 1;
+  transition:
+    opacity 0.25s ease,
+    color 0.25s ease;
+}
+.masthead:has(.nav-item:hover) .nav-item {
+  opacity: 0.55;
+  transition-duration: 0.15s;
+}
+.masthead .nav-item:hover {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-item,
+  .masthead:has(.nav-item:hover) .nav-item {
+    transition: none;
   }
+}
 
-  @media (max-width: 768px) {
-    .section-heading::after {
-      display: none;
-    }
+/* Hidden until keyboard focus, then a small ink chip top-left. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-300%);
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.55rem 0.9rem;
+  font-family: var(--font-spline-mono), monospace;
+  font-size: 0.8rem;
+  transition: transform 0.2s var(--ease-out);
+}
+.skip-link:focus-visible {
+  transform: none;
+  outline-offset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-
-  @keyframes navReveal {
-    from {
-      opacity: 0;
-      transform: translateY(-12px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .axis-letter {
+    font-variation-settings: "wdth" 100;
   }
+}
 
-  .animate-navReveal {
-    animation: navReveal 0.55s ease forwards;
-  }
+/* Redesign variants under /v bring their own ground and texture: hide the
+   paper grain and let each variant paint the page background. */
+body:has([data-variant]) .grain {
+  display: none;
 }
