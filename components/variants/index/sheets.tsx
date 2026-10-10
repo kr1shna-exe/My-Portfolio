@@ -7,7 +7,8 @@ import { useRef, useSyncExternalStore, type RefObject } from "react";
 
 import { cn } from "@/lib/utils";
 
-import { anatomies, featured, isLive, pad, showcase } from "./data";
+import { anatomies, featured, isLive, pad } from "./data";
+import { GlassFrame } from "./glass-frame";
 import { InView } from "./in-view";
 
 const STICKY_QUERY = "(min-width: 1024px) and (min-height: 720px)";
@@ -32,8 +33,7 @@ function Pipeline({ slug }: { slug: string }) {
   return (
     <InView as="figure" className="index-pipe" amount={0.2}>
       <figcaption className="index-pipe-cap">
-        <span>{a.title}</span>
-        <span>{a.stages.length} stages, in order</span>
+        <span>How it works</span>
       </figcaption>
       <ol className="index-pipe-list">
         {a.stages.map((s, i) => (
@@ -74,7 +74,6 @@ function Sheet({
   const veil = useTransform(cover, (v) => (last ? 0 : 0.6 * v));
   const animate = sticky && !reduce;
   const dark = i === 1;
-  const number = showcase.findIndex((s) => s.slug === p.slug) + 1;
 
   return (
     <motion.section
@@ -87,9 +86,8 @@ function Sheet({
       <div className="index-sheet-inner">
         <div className="index-sheet-bar">
           <span>
-            Feature {pad(i + 1)} / {pad(featured.length)}
+            {pad(i + 1)} / {pad(featured.length)}
           </span>
-          <span className="index-hide-sm">Index No. {pad(number)}</span>
           <span>
             {isLive(p) ? (
               <>
@@ -134,13 +132,15 @@ function Sheet({
             className="index-sheet-shot"
             aria-label={`${p.title}, open the live site`}
           >
-            <Image
-              src={p.image}
-              alt={`${p.title} landing page`}
-              fill
-              sizes="(min-width: 1024px) 58vw, 100vw"
-              className="index-cover"
-            />
+            <GlassFrame url={p.liveUrl} label={p.title} tone={dark ? "dark" : "light"}>
+              <Image
+                src={p.image}
+                alt={`${p.title} landing page`}
+                fill
+                sizes="(min-width: 1024px) 58vw, 100vw"
+                className="index-cover"
+              />
+            </GlassFrame>
           </a>
         </div>
 

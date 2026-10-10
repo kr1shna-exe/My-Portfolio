@@ -34,16 +34,14 @@ export function InView({
   );
 }
 
-/** Section flag: newspaper section code, then a poster-scale title whose
-    width axis opens as it arrives. */
+/** Section heading: a heavy rule with an optional one-line fact, then a
+    poster-scale title whose width axis opens as it arrives. */
 export function SectionHead({
-  code,
   title,
   aside,
   id,
   tone,
 }: {
-  code: string;
   title: React.ReactNode;
   aside?: React.ReactNode;
   id: string;
@@ -51,10 +49,7 @@ export function SectionHead({
 }) {
   return (
     <InView as="header" className={cn("index-shead", tone === "ink" && "index-shead-ink")}>
-      <div className="index-shead-bar">
-        <span>{code}</span>
-        {aside && <span className="index-shead-aside">{aside}</span>}
-      </div>
+      <div className="index-shead-bar">{aside && <span className="index-shead-aside">{aside}</span>}</div>
       <h2 id={id} className="index-shead-title">
         {title}
       </h2>

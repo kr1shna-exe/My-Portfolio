@@ -1,30 +1,23 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import { contributionStats } from "@/data/open-source";
 import { experience, moreWork, site } from "@/data/site";
 
-import { Stickers } from "./stickers";
-import { TradingPlaceholder } from "./trading-placeholder";
+import { GlassFrame } from "./glass-frame";
 
 export function LatentNav() {
   const links = [
-    ["#map", "map"],
-    ["#forward-pass", "forward pass"],
-    ["#upstream", "upstream"],
-    ["#record", "record"],
-    ["#about", "about"],
+    ["#work", "Work"],
+    ["#upstream", "Open source"],
+    ["#experience", "Experience"],
+    ["#about", "About"],
   ];
   return (
     <header className="latent-nav">
       <a href="#main" className="latent-nav-mark" aria-label="Krishna, back to top">
-        <span className="latent-nav-dots" aria-hidden>
-          <i />
-          <i />
-          <i />
-        </span>
-        krishna
+        Krishna
       </a>
-      <nav aria-label="Sections" className="latent-nav-links latent-mono">
+      <nav aria-label="Sections" className="latent-nav-links">
         {links.map(([href, label]) => (
           <a key={href} href={href}>
             {label}
@@ -32,30 +25,9 @@ export function LatentNav() {
         ))}
       </nav>
       <a href="#contact" className="latent-nav-cta">
-        say hi
+        Contact
       </a>
     </header>
-  );
-}
-
-export function Marquee({ items, tone }: { items: string[]; tone: "sun" | "pink" | "ink" }) {
-  const row = (hidden: boolean) => (
-    <div className="latent-marquee-row" aria-hidden={hidden || undefined}>
-      {items.map((t, i) => (
-        <span key={i}>
-          {t}
-          <b aria-hidden>✺</b>
-        </span>
-      ))}
-    </div>
-  );
-  return (
-    <div className={`latent-marquee latent-marquee-${tone}`}>
-      <div className="latent-marquee-inner">
-        {row(false)}
-        {row(true)}
-      </div>
-    </div>
   );
 }
 
@@ -63,45 +35,30 @@ export function MoreWork() {
   return (
     <section id="more" className="latent-more" aria-labelledby="latent-more-h" data-nav-section>
       <div className="latent-wrap">
-        <header className="latent-sec-head latent-sec-head-row" data-reveal>
-          <div>
-            <p className="latent-eyebrow latent-mono">
-              <span>03</span> more work
-            </p>
-            <h2 id="latent-more-h" className="latent-h2">
-              More samples from <em>the same distribution.</em>
-            </h2>
-          </div>
-          <p className="latent-lede">
-            Four more products. Different shapes, same habit: build the whole thing, then put the
-            code where you can read it.
-          </p>
+        <header className="latent-sec-head" data-reveal>
+          <p className="latent-eyebrow latent-mono">More work</p>
+          <h2 id="latent-more-h" className="latent-h2">
+            Four more products.
+          </h2>
         </header>
         <ul className="latent-more-grid">
-          {moreWork.map((p, i) => {
+          {moreWork.map((p) => {
             const isTwisense = p.slug === "twisense";
             const isExness = p.slug === "exness";
             return (
-              <li key={p.slug} data-reveal className="latent-more-card" style={{ ["--r" as string]: `${[-1.2, 0.9, 0.7, -0.8][i % 4]}deg` }}>
-                <div className="latent-more-shot">
-                  {isExness ? (
-                    <TradingPlaceholder />
-                  ) : (
-                    <Image
-                      src={p.image}
-                      alt={`${p.title} landing page`}
-                      width={1512}
-                      height={945}
-                      sizes="(max-width: 767px) 92vw, 46vw"
-                    />
-                  )}
-                  <span className="latent-more-seed latent-mono" aria-hidden>
-                    {String(i + 4).padStart(2, "0")} / 07
-                  </span>
-                </div>
+              <li key={p.slug} data-reveal className="latent-more-card">
+                <GlassFrame
+                  title={p.title}
+                  image={isExness ? undefined : p.image}
+                  url={p.liveUrl}
+                  repo={p.repo}
+                  sizes="(max-width: 767px) 92vw, 46vw"
+                />
                 <div className="latent-more-body">
-                  <h3 className="latent-more-title">{p.title}</h3>
-                  {isExness && <span className="latent-tag latent-tag-outline">in production</span>}
+                  <div className="latent-more-row">
+                    <h3 className="latent-more-title">{p.title}</h3>
+                    {isExness && <span className="latent-tag">In production</span>}
+                  </div>
                   <p className="latent-more-tag">{p.tagline}</p>
                   {!isTwisense && (
                     <ul className="latent-chips" aria-label="Stack">
@@ -135,29 +92,22 @@ export function MoreWork() {
 
 export function Experience() {
   return (
-    <section id="record" className="latent-xp" aria-labelledby="latent-xp-h" data-nav-section>
+    <section id="experience" className="latent-xp" aria-labelledby="latent-xp-h" data-nav-section>
       <div className="latent-wrap">
-        <header className="latent-sec-head latent-sec-head-row" data-reveal>
-          <div>
-            <p className="latent-eyebrow latent-mono">
-              <span>05</span> experience
-            </p>
-            <h2 id="latent-xp-h" className="latent-h2 latent-h2-xl">
-              The training <em>run.</em>
-            </h2>
-          </div>
-          <p className="latent-lede">Three epochs so far. The latest one is still running.</p>
+        <header className="latent-sec-head" data-reveal>
+          <p className="latent-eyebrow latent-mono">Experience</p>
+          <h2 id="latent-xp-h" className="latent-h2">
+            Where I&apos;ve worked.
+          </h2>
         </header>
         <ol className="latent-xp-list">
-          {experience.map((e, i) => {
-            const epoch = experience.length - i;
+          {experience.map((e) => {
             const current = e.end === "Present";
             return (
               <li key={e.company} className="latent-xp-row" data-reveal>
-                <p className="latent-mono latent-xp-epoch">
-                  epoch {String(epoch).padStart(2, "0")}
+                <p className="latent-mono latent-xp-when">
                   <span>
-                    {e.start} → {e.end}
+                    {e.start} – {e.end}
                   </span>
                   <span>{e.location}</span>
                 </p>
@@ -174,7 +124,7 @@ export function Experience() {
                   </h3>
                   <p className="latent-xp-role">
                     {e.role}
-                    {current && <span className="latent-sticker latent-sticker-sun latent-sticker-sm">now</span>}
+                    {current && <span className="latent-tag">Current</span>}
                   </p>
                 </div>
                 <div className="latent-xp-body">
@@ -198,13 +148,48 @@ export function Experience() {
 
 export function About() {
   const [lead, ...rest] = site.bio;
+  const facts: { k: string; v: React.ReactNode }[] = [
+    {
+      k: "Now",
+      v: (
+        <>
+          {site.role},{" "}
+          <a href={site.company.href} target="_blank" rel="noreferrer">
+            {site.company.name}
+          </a>
+        </>
+      ),
+    },
+    {
+      k: "Before",
+      v: experience
+        .slice(1)
+        .map((e) => e.company)
+        .join(", "),
+    },
+    { k: "Shipped", v: `${site.stats[0].value} products, ${site.stats[1].value} live` },
+    { k: "Open source", v: `${contributionStats.merged} merged PRs across ${contributionStats.repos} projects` },
+    {
+      k: "Elsewhere",
+      v: (
+        <>
+          {site.socials.map((s, i) => (
+            <span key={s.label}>
+              {i > 0 && ", "}
+              <a href={s.href} target="_blank" rel="noreferrer">
+                {s.label}
+              </a>
+            </span>
+          ))}
+        </>
+      ),
+    },
+  ];
   return (
     <section id="about" className="latent-about" aria-labelledby="latent-about-h" data-nav-section>
       <div className="latent-wrap latent-about-grid">
         <div data-reveal>
-          <p className="latent-eyebrow latent-mono">
-            <span>06</span> about
-          </p>
+          <p className="latent-eyebrow latent-mono">About</p>
           <h2 id="latent-about-h" className="latent-sr">
             About Krishna
           </h2>
@@ -215,7 +200,14 @@ export function About() {
             </p>
           ))}
         </div>
-        <Stickers />
+        <dl className="latent-facts" data-reveal>
+          {facts.map((f) => (
+            <div key={f.k}>
+              <dt className="latent-mono">{f.k}</dt>
+              <dd>{f.v}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
   );

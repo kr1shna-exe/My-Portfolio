@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 import { HIDE_DETAILS, isLive, pad, showcase } from "./data";
+import { GlassFrame } from "./glass-frame";
 import { TradingPlate } from "./trading-plate";
 
 /* Measure, per row, the width-axis value at which the title exactly fills
@@ -134,8 +135,8 @@ export function WorkIndex() {
     <div className="index-work" onPointerEnter={enter} onPointerMove={track} onPointerLeave={leave}>
       <div className="index-work-legend" aria-hidden>
         <span>No.</span>
-        <span>Title</span>
-        <span>Brief · Stack · Status</span>
+        <span>Project</span>
+        <span>What it does</span>
       </div>
       <ol ref={listRef} className="index-rows">
         {showcase.map((p, i) => {
@@ -160,7 +161,7 @@ export function WorkIndex() {
                 </span>
                 {p.featured ? (
                   <a href={href} className="index-stretch">
-                    <span className="index-sr">{p.title}: open the feature sheet</span>
+                    <span className="index-sr">{p.title}: details below</span>
                   </a>
                 ) : (
                   <Link href={href} className="index-stretch">
@@ -179,7 +180,7 @@ export function WorkIndex() {
                   ) : (
                     p.status
                   )}
-                  {p.featured && <span className="index-row-feat">Feature {pad(i + 1)}</span>}
+                  {p.featured && <span className="index-row-feat">Featured</span>}
                   {p.liveUrl && (
                     <a href={p.liveUrl} target="_blank" rel="noreferrer" className="index-row-link">
                       site<span aria-hidden> ↗</span>
@@ -195,11 +196,13 @@ export function WorkIndex() {
                 </p>
               </div>
               <div className="index-row-thumb" aria-hidden>
-                {p.slug === "exness" ? (
-                  <TradingPlate compact />
-                ) : (
-                  <Image src={p.image} alt="" fill sizes="132px" className="index-cover" />
-                )}
+                <GlassFrame label={p.title} size="mini">
+                  {p.slug === "exness" ? (
+                    <TradingPlate compact />
+                  ) : (
+                    <Image src={p.image} alt="" fill sizes="132px" className="index-cover" />
+                  )}
+                </GlassFrame>
               </div>
             </li>
           );
@@ -207,18 +210,20 @@ export function WorkIndex() {
       </ol>
 
       <div ref={floatRef} className={cn("index-float", active && "is-on")} aria-hidden>
-        {showcase.map((p) => (
-          <div key={p.slug} className={cn("index-float-img", active === p.slug && "is-on")}>
-            {p.slug === "exness" ? (
-              <TradingPlate />
-            ) : (
-              <Image src={p.image} alt="" fill sizes="(min-width: 1024px) 30vw, 1px" className="index-cover" />
-            )}
-          </div>
-        ))}
-        <span className="index-float-cap">
-          {showcase.find((p) => p.slug === active)?.title ?? ""}
-        </span>
+        <GlassFrame
+          label={showcase.find((p) => p.slug === active)?.title ?? ""}
+          url={showcase.find((p) => p.slug === active)?.liveUrl}
+        >
+          {showcase.map((p) => (
+            <div key={p.slug} className={cn("index-float-img", active === p.slug && "is-on")}>
+              {p.slug === "exness" ? (
+                <TradingPlate />
+              ) : (
+                <Image src={p.image} alt="" fill sizes="(min-width: 1024px) 30vw, 1px" className="index-cover" />
+              )}
+            </div>
+          ))}
+        </GlassFrame>
       </div>
     </div>
   );

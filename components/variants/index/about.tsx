@@ -2,7 +2,7 @@ import { site } from "./data";
 import { InView } from "./in-view";
 
 /* Opinion column: a pull quote at poster scale, the bio set in a narrow
-   justified column with a drop cap, and a second quote breaking it. Both
+   justified column, and a second quote breaking it. Both
    quotes are lifted verbatim from the bio. */
 export function About() {
   const [p1, p2, p3] = site.bio;
@@ -18,13 +18,7 @@ export function About() {
         <p className="index-pull-by">Krishna · Founding AI/ML engineer</p>
       </InView>
       <div className="index-column">
-        <p>
-          <span className="index-dropcap" aria-hidden>
-            {p1.charAt(0)}
-          </span>
-          <span className="index-sr">{p1.charAt(0)}</span>
-          {p1.slice(1)}
-        </p>
+        <p>{p1}</p>
         <p>{p2}</p>
         <aside className="index-pull-sm" aria-label="Pull quote">
           <p>Read the code before you read the pitch.</p>

@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { contributionStats } from "@/data/open-source";
 
 import { featured, liveCount, pad, repoCount, site } from "./data";
+import { GlassFrame } from "./glass-frame";
 
 const NAME = "KRISHNA".split("");
 const MIN = 62;
@@ -124,13 +125,16 @@ export function IndexHero() {
   return (
     <section id="top" className="index-hero" aria-labelledby="index-h1">
       <div className="index-dateline">
-        <span>{site.role}</span>
-        <span className="index-hide-sm">Edition of {site.updated}</span>
-        <span className="index-hide-sm">Remote</span>
         <span>
-          <i className="index-live-dot" aria-hidden /> {liveCount} live · {repoCount} repos
+          {site.role} at {site.company.name}
         </span>
-        <span className="index-hide-md">Everything open source</span>
+        <span className="index-dateline-links index-hide-sm">
+          {site.socials.map((x) => (
+            <a key={x.label} href={x.href} target="_blank" rel="noreferrer">
+              {x.label}
+            </a>
+          ))}
+        </span>
       </div>
 
       <h1 id="index-h1" className="index-name" aria-label={site.name}>
@@ -184,38 +188,34 @@ export function IndexHero() {
             <dd>{repoCount}</dd>
           </div>
           <div>
-            <dt>Upstream</dt>
+            <dt>Open source</dt>
             <dd>
-              <a href="#record" className="index-ul">
+              <a href="#open-source" className="index-ul">
                 {contributionStats.merged} PRs merged <span aria-hidden>↓</span>
               </a>
             </dd>
           </div>
-          <div>
-            <dt>Updated</dt>
-            <dd>{site.updated}</dd>
-          </div>
         </dl>
           <div className="index-hero-ctas">
             <a href="#work" className="index-btn index-btn-ink">
-              The index <span aria-hidden>↓</span>
+              See the work <span aria-hidden>↓</span>
             </a>
             <a href={`mailto:${site.email}`} className="index-btn">
-              Write to me <span aria-hidden>↗</span>
+              Email me <span aria-hidden>↗</span>
             </a>
           </div>
         </div>
       </div>
 
-      <nav className="index-inside" aria-label="Inside: featured work">
-        <span className="index-inside-label">Inside</span>
+      <nav className="index-inside" aria-label="Featured work">
+        <span className="index-inside-label">Featured</span>
         {featured.map((p, i) => (
           <a key={p.slug} href={`#sheet-${p.slug}`} className="index-inside-item">
-            <span className="index-inside-thumb">
-              <Image src={p.image} alt="" fill sizes="96px" className="index-cover" />
-            </span>
+            <GlassFrame label={p.title} size="mini" className="index-inside-thumb">
+              <Image src={p.image} alt="" fill sizes="110px" className="index-cover" />
+            </GlassFrame>
             <span className="index-inside-text">
-              <span className="index-inside-no">A3 · Feature {pad(i + 1)}</span>
+              <span className="index-inside-no">{pad(i + 1)}</span>
               <span className="index-inside-title">{p.title}</span>
             </span>
             <span aria-hidden className="index-inside-arrow">↓</span>

@@ -2,22 +2,17 @@
 
 import { useEffect, useRef } from "react";
 
-import { contributionStats, contributionsByRepo } from "@/data/open-source";
+import { contributionStats } from "@/data/open-source";
 import { site } from "@/data/site";
 
 import { LatentField } from "./latent-field";
 
-const STEPS = 50;
-
+/* Full-screen hero. The name forms out of particle noise once on load; moving
+   the pointer over it scatters nearby particles a little and they settle back.
+   No labels, no cursor change. */
 export function LatentHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stepRef = useRef<HTMLSpanElement>(null);
-  const sigmaRef = useRef<HTMLSpanElement>(null);
-  const barRef = useRef<HTMLDivElement>(null);
-  const localRef = useRef<HTMLDivElement>(null);
-  const localValRef = useRef<HTMLSpanElement>(null);
-  const fieldRef = useRef<LatentField | null>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -31,40 +26,24 @@ export function LatentHero() {
       getComputedStyle(canvas).getPropertyValue("--font-bricolage").trim() ||
       "system-ui, sans-serif";
 
-    const writeStep = (step: number, sigma: number) => {
-      if (stepRef.current) stepRef.current.textContent = String(step).padStart(2, "0");
-      if (sigmaRef.current) sigmaRef.current.textContent = sigma.toFixed(3);
-      barRef.current?.style.setProperty("--step", String(step));
-    };
-
     const field = new LatentField(canvas, {
       text: "KRISHNA",
       fontFamily: family,
       fontWeight: 800,
       palette: [
-        { color: "#f5f3ec", share: 0.8, size: small ? 1.5 : 1.7, alpha: 0.95 },
-        { color: "#ffd65c", share: 0.11, size: small ? 1.8 : 2.2 },
-        { color: "#ff9fc0", share: 0.09, size: small ? 1.8 : 2.2 },
+        { color: "#f5f3ec", share: 0.8, size: small ? 1.5 : 1.7, alpha: 0.96 },
+        { color: "#b9b6ad", share: 0.12, size: small ? 1.6 : 1.9 },
+        { color: "#6f6d67", share: 0.08, size: small ? 1.6 : 2 },
       ],
       density: small ? 7 : 5.6,
       min: small ? 1800 : 2600,
       max: small ? 2600 : 8000,
-      centerY: (w, h) => (w < 768 ? 0.3 : h < 760 ? 0.35 : 0.375),
-      maxW: small ? 0.9 : 0.9,
+      centerY: (w, h) => (w < 768 ? 0.27 : h < 760 ? 0.32 : 0.35),
+      maxW: 0.9,
       maxH: small ? 0.2 : 0.36,
       duration: 2800,
-      steps: STEPS,
-      brush: small ? 70 : 115,
-      onStep: writeStep,
-      onLocal: (x, y, sigma, on) => {
-        const el = localRef.current;
-        if (!el) return;
-        el.style.transform = `translate3d(${x + 18}px, ${y + 14}px, 0)`;
-        el.dataset.on = on ? "1" : "0";
-        if (localValRef.current) localValRef.current.textContent = sigma.toFixed(2);
-      },
+      brush: small ? 60 : 95,
     });
-    fieldRef.current = field;
 
     const start = async () => {
       try {
@@ -74,20 +53,12 @@ export function LatentHero() {
       }
       if (disposed) return;
       field.layout();
-      if (reduce) {
-        field.still(1);
-        writeStep(STEPS, 0);
-      } else {
-        field.resample();
-      }
-      section.dataset.ready = "1";
+      if (reduce) field.still(1);
+      else field.resample();
     };
     start();
 
-    const io = new IntersectionObserver(
-      ([entry]) => field.setVisible(entry.isIntersecting),
-      { threshold: 0 }
-    );
+    const io = new IntersectionObserver(([entry]) => field.setVisible(entry.isIntersecting));
     io.observe(section);
     const onVis = () => field.setHidden(document.hidden);
     document.addEventListener("visibilitychange", onVis);
@@ -101,27 +72,23 @@ export function LatentHero() {
       clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => {
         field.layout();
-        if (reduce) field.still(1);
-        else field.still(field.tau);
+        field.still(reduce ? 1 : field.tau);
       }, 120);
     });
     ro.observe(canvas);
 
-    const local = (clientX: number, clientY: number) => {
+    const local = (x: number, y: number) => {
       const r = canvas.getBoundingClientRect();
-      field.pointer(clientX - r.left, clientY - r.top);
+      field.pointer(x - r.left, y - r.top);
     };
     const onMove = (e: PointerEvent) => {
-      if (reduce) return;
-      local(e.clientX, e.clientY);
+      if (!reduce) local(e.clientX, e.clientY);
     };
     const onTouch = (e: TouchEvent) => {
-      if (reduce || !e.touches[0]) return;
-      local(e.touches[0].clientX, e.touches[0].clientY);
+      if (!reduce && e.touches[0]) local(e.touches[0].clientX, e.touches[0].clientY);
     };
     const onLeave = () => field.pointerLeave();
     section.addEventListener("pointermove", onMove, { passive: true });
-    section.addEventListener("pointerdown", onMove, { passive: true });
     section.addEventListener("touchmove", onTouch, { passive: true });
     section.addEventListener("pointerleave", onLeave);
     section.addEventListener("touchend", onLeave);
@@ -134,44 +101,33 @@ export function LatentHero() {
       clearTimeout(resizeTimer);
       document.removeEventListener("visibilitychange", onVis);
       section.removeEventListener("pointermove", onMove);
-      section.removeEventListener("pointerdown", onMove);
       section.removeEventListener("touchmove", onTouch);
       section.removeEventListener("pointerleave", onLeave);
       section.removeEventListener("touchend", onLeave);
     };
   }, []);
 
+  const stats = [
+    site.stats[0],
+    site.stats[1],
+    { value: String(contributionStats.merged), label: "PRs merged upstream" },
+  ];
+
   return (
-    <section
-      ref={sectionRef}
-      className="latent-hero"
-      aria-labelledby="latent-h1"
-      data-nav-section
-    >
-      <div className="latent-hero-glow" aria-hidden>
-        <i className="latent-glow-sun" />
-        <i className="latent-glow-pink" />
-      </div>
+    <section ref={sectionRef} className="latent-hero" aria-labelledby="latent-h1" data-nav-section>
       <div className="latent-hero-grid" aria-hidden />
       <canvas
         ref={canvasRef}
         className="latent-hero-canvas"
         role="img"
-        aria-label="The name KRISHNA, drawn by thousands of particles denoising out of Gaussian noise"
+        aria-label="The name KRISHNA, drawn in particles"
       />
-      <div ref={localRef} className="latent-local" aria-hidden data-on="0">
-        σ<sub>local</sub> <span ref={localValRef}>0.00</span>
-      </div>
 
       <div className="latent-hero-copy">
         <div className="latent-hero-left">
-          <a
-            className="latent-sticker latent-sticker-sun"
-            href={site.company.href}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <span className="latent-dot" aria-hidden /> {site.role} @ {site.company.name}
+          <a className="latent-pill" href={site.company.href} target="_blank" rel="noreferrer">
+            <span className="latent-pill-dot" aria-hidden />
+            {site.role} at {site.company.name}
           </a>
           <h1 id="latent-h1" className="latent-hero-h1">
             <span className="latent-sr">Krishna. </span>
@@ -181,7 +137,7 @@ export function LatentHero() {
         <div className="latent-hero-right">
           <p className="latent-hero-sub">{site.subline}</p>
           <dl className="latent-stats">
-            {site.stats.map((s) => (
+            {stats.map((s) => (
               <div key={s.label}>
                 <dt>{s.label}</dt>
                 <dd>{s.value}</dd>
@@ -189,57 +145,14 @@ export function LatentHero() {
             ))}
           </dl>
           <div className="latent-ctas">
-            <a href="#map" className="latent-btn latent-btn-paper">
-              Explore the map <span aria-hidden>↘</span>
+            <a href="#work" className="latent-btn latent-btn-solid">
+              See the work <span aria-hidden>↓</span>
             </a>
             <a href={`mailto:${site.email}`} className="latent-btn latent-btn-ghost">
               Email me
             </a>
           </div>
-          <p className="latent-hero-proof latent-mono">
-            + {contributionStats.merged} PRs merged upstream into{" "}
-            <a href="#upstream">
-              {contributionsByRepo
-                .slice(0, 3)
-                .map((r) => r.name)
-                .join(", ")}{" "}
-              and {contributionsByRepo.length - 3} more
-            </a>
-          </p>
         </div>
-      </div>
-
-      <div className="latent-hero-hud latent-mono">
-        <div className="latent-hud-left">
-          <div className="latent-readout">
-            <span>
-              step <b ref={stepRef}>00</b>/{STEPS}
-            </span>
-            <span>
-              σ <b ref={sigmaRef}>1.000</b>
-            </span>
-          </div>
-          <div ref={barRef} className="latent-ticks" aria-hidden style={{ ["--step" as string]: 0 }}>
-            {Array.from({ length: STEPS }, (_, i) => (
-              <i key={i} style={{ ["--i" as string]: i }} />
-            ))}
-          </div>
-        </div>
-        <div className="latent-hud-right">
-          <button
-            type="button"
-            className="latent-resample"
-            onClick={() => fieldRef.current?.resample()}
-          >
-            resample <span aria-hidden>↻</span>
-          </button>
-          <span className="latent-hint">move or drag over the name to add noise</span>
-        </div>
-      </div>
-
-      <div className="latent-hero-axis latent-mono" aria-hidden>
-        <span>x₀ ~ p(krishna)</span>
-        <span>DDPM · cosine schedule · T = {STEPS}</span>
       </div>
     </section>
   );

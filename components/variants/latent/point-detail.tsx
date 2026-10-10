@@ -1,9 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 
 
 import { CLUSTERS, NEIGHBOURS, POINT_BY_ID, type MapPoint } from "./map-data";
-import { TradingPlaceholder } from "./trading-placeholder";
+import { GlassFrame } from "./glass-frame";
 
 export function PointDetail({
   point,
@@ -20,18 +19,17 @@ export function PointDetail({
       <Visual point={point} compact={compact} />
       <div className="latent-detail-tags">
         {point.kind === "role" ? (
-          <span className="latent-tag latent-tag-ink">role · between {CLUSTERS[point.between[0]].short} &amp; {CLUSTERS[point.between[1]].short}</span>
+          <span className="latent-tag">
+            Role · {CLUSTERS[point.between[0]].label} and {CLUSTERS[point.between[1]].label.toLowerCase()}
+          </span>
         ) : (
-          <span className={`latent-tag latent-tone-${CLUSTERS[point.cluster].tone}`}>
+          <span className="latent-tag">
             {CLUSTERS[point.cluster].label}
           </span>
         )}
         {point.kind === "project" && point.project.featured && (
-          <span className="latent-tag latent-tag-outline">featured</span>
+          <span className="latent-tag latent-tag-outline">Featured</span>
         )}
-        <span className="latent-coord latent-mono" aria-hidden>
-          ({((point.x - 50) / 50).toFixed(2)}, {((34 - point.y) / 34).toFixed(2)})
-        </span>
       </div>
 
       {point.kind === "project" && (
@@ -102,7 +100,7 @@ export function PointDetail({
       )}
 
       <div className="latent-nn">
-        <p className="latent-mono latent-nn-head">nearest neighbours · cos sim</p>
+        <p className="latent-mono latent-nn-head">Closest on the map</p>
         <ol>
           {nn.map((n) => {
             const q = POINT_BY_ID[n.id];
@@ -112,13 +110,12 @@ export function PointDetail({
                   type="button"
                   onClick={() => onPick?.(n.id)}
                   disabled={!onPick}
-                  aria-label={`${q.label}, similarity ${n.sim.toFixed(2)}${onPick ? ". Select" : ""}`}
+                  aria-label={`${q.label}${onPick ? ". Select" : ""}`}
                 >
                   <span className="latent-nn-name">{q.label}</span>
                   <span className="latent-nn-bar" aria-hidden>
                     <i style={{ transform: `scaleX(${n.sim})` }} />
                   </span>
-                  <span className="latent-mono latent-nn-val">{n.sim.toFixed(2)}</span>
                 </button>
               </li>
             );
@@ -131,30 +128,23 @@ export function PointDetail({
 
 function Visual({ point, compact }: { point: MapPoint; compact: boolean }) {
   if (point.kind === "project") {
-    if (point.project.slug === "exness") {
-      return (
-        <div className="latent-shot latent-shot-ph">
-          <TradingPlaceholder />
-        </div>
-      );
-    }
+    const p = point.project;
     return (
-      <div className="latent-shot">
-        <Image
-          src={point.project.image}
-          alt={`${point.project.title} landing page`}
-          width={1512}
-          height={945}
-          sizes={compact ? "(max-width: 767px) 92vw, 400px" : "(max-width: 1100px) 40vw, 440px"}
-        />
-      </div>
+      <GlassFrame
+        tone="light"
+        title={p.title}
+        image={p.slug === "exness" ? undefined : p.image}
+        url={p.liveUrl}
+        repo={p.repo}
+        sizes={compact ? "(max-width: 767px) 92vw, 400px" : "(max-width: 1100px) 40vw, 440px"}
+      />
     );
   }
   if (point.kind === "role") {
     return (
       <div className="latent-shot latent-shot-role">
         <span className="latent-mono">
-          {point.role.start} → {point.role.end} · {point.role.location}
+          {point.role.start} – {point.role.end} · {point.role.location}
         </span>
         <b>{point.role.company}</b>
       </div>

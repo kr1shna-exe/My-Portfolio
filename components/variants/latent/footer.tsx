@@ -10,8 +10,6 @@ import { LatentField } from "./latent-field";
 export function LatentFooter() {
   const ref = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stepRef = useRef<HTMLSpanElement>(null);
-  const capRef = useRef<HTMLSpanElement>(null);
   const fieldRef = useRef<LatentField | null>(null);
   const state = useRef({ progress: 0, leaving: false, reduce: false });
 
@@ -22,12 +20,6 @@ export function LatentFooter() {
     const s = state.current;
     if (!f || s.reduce) return;
     f.follow(s.leaving ? 0 : Math.min(1, s.progress * 1.25));
-    if (capRef.current)
-      capRef.current.textContent = s.leaving
-        ? "leaving already? re-noising…"
-        : s.progress * 1.25 >= 1
-          ? "sample complete"
-          : "denoising as you arrive";
   };
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
@@ -48,9 +40,9 @@ export function LatentFooter() {
       text: "KRISHNA",
       fontFamily: family,
       palette: [
-        { color: "#f5f3ec", share: 0.5, size: small ? 1.3 : 1.6, alpha: 0.9 },
-        { color: "#8c98ff", share: 0.35, size: small ? 1.4 : 1.8 },
-        { color: "#ff9fc0", share: 0.15, size: small ? 1.6 : 2 },
+        { color: "#f5f3ec", share: 0.62, size: small ? 1.3 : 1.6, alpha: 0.9 },
+        { color: "#8f8c85", share: 0.26, size: small ? 1.4 : 1.8 },
+        { color: "#4a4844", share: 0.12, size: small ? 1.6 : 2 },
       ],
       density: small ? 9 : 6,
       min: 1400,
@@ -59,10 +51,6 @@ export function LatentFooter() {
       maxW: 0.94,
       maxH: 0.82,
       brush: small ? 60 : 100,
-      onStep: (step, sigma) => {
-        if (stepRef.current)
-          stepRef.current.textContent = `step ${String(step).padStart(2, "0")}/50 · σ ${sigma.toFixed(3)}`;
-      },
     });
     fieldRef.current = field;
     let disposed = false;
@@ -77,7 +65,6 @@ export function LatentFooter() {
       field.layout();
       if (reduce) {
         field.still(1);
-        if (stepRef.current) stepRef.current.textContent = "step 50/50 · σ 0.000";
       } else {
         field.still(0);
         field.tau = 0;
@@ -135,47 +122,37 @@ export function LatentFooter() {
 
   return (
     <footer ref={ref} id="contact" className="latent-foot" aria-labelledby="latent-foot-h" data-nav-section>
-      <div className="latent-wrap">
-        <p className="latent-eyebrow latent-mono">
-          <span>07</span> contact
-        </p>
-        <h2 id="latent-foot-h" className="latent-h2 latent-h2-xl latent-foot-h">
-          Got something that should <em>do real work?</em>
-        </h2>
-        <a className="latent-foot-mail" href={`mailto:${site.email}`}>
-          {site.email}
-        </a>
-        <ul className="latent-foot-socials" aria-label="Elsewhere">
-          {site.socials.map((s, i) => (
-            <li key={s.label}>
-              <a
-                href={s.href}
-                target="_blank"
-                rel="noreferrer"
-                className={`latent-sticker ${["latent-sticker-sun", "latent-sticker-pink", "latent-sticker-paper"][i % 3]}`}
-              >
-                {s.label} ↗
-              </a>
-            </li>
-          ))}
-        </ul>
+      <div className="latent-wrap latent-foot-grid">
+        <div>
+          <p className="latent-eyebrow latent-mono">Contact</p>
+          <h2 id="latent-foot-h" className="latent-h2 latent-foot-h">
+            Get in touch.
+          </h2>
+        </div>
+        <div className="latent-foot-side">
+          <a className="latent-foot-mail" href={`mailto:${site.email}`}>
+            {site.email}
+          </a>
+          <ul className="latent-foot-socials" aria-label="Elsewhere">
+            {site.socials.map((s) => (
+              <li key={s.label}>
+                <a href={s.href} target="_blank" rel="noreferrer" className="latent-link-pill">
+                  {s.label} <span aria-hidden>↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
       <div className="latent-foot-canvas-wrap">
-        <canvas
-          ref={canvasRef}
-          className="latent-foot-canvas"
-          role="img"
-          aria-label="The name KRISHNA as particles, which dissolve back into noise when you leave the page"
-        />
-        <p className="latent-mono latent-foot-readout" aria-hidden>
-          <span ref={stepRef}>step 00/50 · σ 1.000</span>
-          <span ref={capRef}>denoising as you arrive</span>
-        </p>
+        <canvas ref={canvasRef} className="latent-foot-canvas" role="img" aria-label="The name KRISHNA, drawn in particles" />
       </div>
       <div className="latent-wrap latent-foot-bottom latent-mono">
-        <span>Krishna · {site.role}</span>
-        <span>updated {site.updated}</span>
-        <a href="#main">back to x₀ ↑</a>
+        <span>
+          Krishna · {site.role} at {site.company.name}
+        </span>
+        <span>Updated {site.updated}</span>
+        <a href="#main">Back to top ↑</a>
       </div>
     </footer>
   );

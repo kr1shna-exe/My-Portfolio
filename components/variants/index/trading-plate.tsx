@@ -30,7 +30,6 @@ export function TradingPlate({ compact = false }: { compact?: boolean }) {
       {!compact && (
         <div className="index-plate-cap">
           <span>Trading Platform</span>
-          <span>In production · no public build</span>
         </div>
       )}
     </div>

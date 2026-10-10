@@ -1,6 +1,6 @@
 import { contributionsByRepo, contributionStats } from "@/data/open-source";
 
-import { formatDate, pad } from "./data";
+import { formatDate } from "./data";
 import { InView } from "./in-view";
 import { LedgerGroup, type LedgerRow } from "./ledger-group";
 import { Tally } from "./tally";
@@ -28,10 +28,10 @@ export function Ledger() {
     <div className="index-ledger">
       <InView className="index-tally">
         <div className="index-tally-main">
-          <span className="index-tally-label">Pull requests merged upstream</span>
+          <span className="index-tally-label">Merged pull requests</span>
           <Tally value={s.merged} pad className="index-tally-big" />
           <p className="index-tally-dek">
-            Into {s.repos} AI and developer-tool projects, between {formatDate(s.since)} and{" "}
+            To {s.repos} open-source AI and developer-tool projects, from {formatDate(s.since)} to{" "}
             {formatDate(s.latest)}.
           </p>
         </div>
@@ -43,7 +43,7 @@ export function Ledger() {
             </span>
           </div>
           <div>
-            <span className="index-tally-label">Merged within</span>
+            <span className="index-tally-label">Time span</span>
             <span className="index-tally-fig">
               <Tally value={days} /> days
             </span>
@@ -68,7 +68,7 @@ export function Ledger() {
           </div>
           <div>
             <span className="index-tally-label">Status</span>
-            <span className="index-tally-fig index-tally-word">▲ All merged</span>
+            <span className="index-tally-fig index-tally-word">All merged</span>
           </div>
         </div>
       </InView>
@@ -153,7 +153,7 @@ export function Ledger() {
           <tfoot>
             <tr>
               <td colSpan={5}>
-                {pad(s.merged)} pull requests · all merged · {s.repos} projects I don&apos;t own ·{" "}
+                {s.merged} pull requests · all merged · {s.repos} projects ·{" "}
                 {s.files} files · +{s.linesAdded.toLocaleString("en-US")} / −
                 {s.linesRemoved.toLocaleString("en-US")}
               </td>

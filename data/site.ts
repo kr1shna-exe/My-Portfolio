@@ -59,22 +59,10 @@ export { experience };
 /** Every variant, for the hub page and the floating switcher. */
 export const VARIANTS = [
   {
-    slug: "launch",
-    name: "Launch",
-    pitch: "A venture-backed launch page, but the product is you.",
-    feel: "Dark, glassy, aurora light, bento grid",
-  },
-  {
-    slug: "trace",
-    name: "Trace",
-    pitch: "The site is a live agent run you can question.",
-    feel: "Night-shift console, span waterfalls, mono type",
-  },
-  {
     slug: "latent",
     name: "Latent",
-    pitch: "Your name denoises out of static; the work is an embedding map.",
-    feel: "Cobalt field, particles, playful and loud",
+    pitch: "Your name forms out of particles; the work reads as a network.",
+    feel: "Black and white, particles, horizontal project slides",
   },
   {
     slug: "index",

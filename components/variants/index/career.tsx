@@ -15,9 +15,7 @@ export function Career() {
                 {shortMonth(x.start)} → {now ? "now" : shortMonth(x.end)}
               </span>
               {now && (
-                <span className="index-role-now">
-                  <i className="index-live-dot" aria-hidden /> Current
-                </span>
+                <span className="index-role-now">Current</span>
               )}
             </p>
             <h3 className="index-role-co">

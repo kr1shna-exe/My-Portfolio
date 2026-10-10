@@ -2,17 +2,17 @@
 
 import {
   motion,
-  useMotionValueEvent,
   useScroll,
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 
 import { anatomies } from "@/data/projects";
-import { featured, type ShowcaseProject } from "@/data/site";
+import { featured, moreWork, type ShowcaseProject } from "@/data/site";
+
+import { GlassFrame } from "./glass-frame";
 
 // Track geometry in vw: intro + 3 panels + outro. Distance travelled = TOTAL - 100.
 const INTRO = 56;
@@ -51,7 +51,6 @@ const SECTION_VH = 100 + UNITS * 62;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 const LAYERS = [3, 4, 5, 4, 2];
-const STACKED = "(max-width: 899px), (prefers-reduced-motion: reduce)";
 const COL_X = (i: number) => 100 + i * 200;
 const NODE_Y = (n: number, j: number) => 85 + (j - (n - 1) / 2) * 34;
 
@@ -76,28 +75,27 @@ export function ForwardPass() {
       <div className="latent-fp-sticky">
         <motion.div className="latent-fp-track" style={{ x }}>
           <div className="latent-fp-intro" style={{ ["--w" as string]: `${INTRO}vw` }}>
-            <p className="latent-eyebrow latent-mono">
-              <span>02</span> featured work
-            </p>
+            <p className="latent-eyebrow latent-mono">Selected work</p>
             <h2 id="latent-fp-h" className="latent-h2 latent-h2-xl">
-              A forward pass through <em>three</em> builds.
+              Three products, step by step.
             </h2>
             <p className="latent-lede">
-              Each one is five layers, from input to output. Keep scrolling and watch the
-              activations move through.
-            </p>
-            <p className="latent-fp-hint latent-mono" aria-hidden>
-              scroll <span>→ → →</span>
+              CodeBoss, Memora and Vision2React, each laid out as the five stages it runs from
+              input to output.
             </p>
           </div>
           {featured.map((p, i) => (
             <Panel key={p.slug} project={p} index={i} progress={scrollYProgress} />
           ))}
           <div className="latent-fp-outro" style={{ ["--w" as string]: `${OUTRO}vw` }}>
-            <p className="latent-mono latent-fp-out-k">output</p>
-            <p className="latent-fp-out">shipped.</p>
-            <a href="#more" className="latent-btn latent-btn-sun">
-              More samples <span aria-hidden>↓</span>
+            <p className="latent-eyebrow latent-mono">Also built</p>
+            <ul className="latent-fp-out-list">
+              {moreWork.map((p) => (
+                <li key={p.slug}>{p.title}</li>
+              ))}
+            </ul>
+            <a href="#more" className="latent-btn latent-btn-solid">
+              More work <span aria-hidden>↓</span>
             </a>
           </div>
         </motion.div>
@@ -119,7 +117,6 @@ function Panel({
   progress: MotionValue<number>;
 }) {
   const ref = useRef<HTMLElement>(null);
-  const readout = useRef<HTMLSpanElement>(null);
   const anatomy = anatomies[project.slug];
   // Desktop: activation runs while the track rests on this panel.
   const [r0, r1] = REST_AT[index];
@@ -131,18 +128,6 @@ function Panel({
   });
   const pm = useTransform(local, (v) => Math.min(1, Math.max(0, v * 1.15)));
 
-  const write = (v: number) => {
-    if (!readout.current) return;
-    const layer = Math.min(5, Math.floor(v * 5.5));
-    readout.current.textContent =
-      layer === 0 ? "layer 0/5 · waiting for input" : `layer ${layer}/5 · ${layer === 5 ? "output ready" : "activating"}`;
-  };
-  useMotionValueEvent(pd, "change", (v) => {
-    if (!window.matchMedia(STACKED).matches) write(v);
-  });
-  useMotionValueEvent(pm, "change", (v) => {
-    if (window.matchMedia(STACKED).matches) write(v);
-  });
   return (
     <motion.article
       ref={ref}
@@ -153,7 +138,10 @@ function Panel({
       <div className="latent-fp-top">
         <div className="latent-fp-copy">
           <p className="latent-mono latent-fp-k">
-            <span>02.{index + 1}</span> {anatomy.title.toLowerCase()}
+            <span>
+              {String(index + 1).padStart(2, "0")} / {String(featured.length).padStart(2, "0")}
+            </span>
+            {anatomy.title}
           </p>
           <h3 id={`latent-fp-${project.slug}`} className="latent-fp-title">
             {project.title}
@@ -166,7 +154,7 @@ function Panel({
           </ul>
           <div className="latent-fp-links">
             {project.liveUrl && (
-              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="latent-btn latent-btn-paper latent-btn-sm">
+              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="latent-btn latent-btn-solid latent-btn-sm">
                 Live ↗
               </a>
             )}
@@ -181,12 +169,12 @@ function Panel({
           </div>
         </div>
         <div className="latent-fp-shot">
-          <Image
-            src={project.image}
-            alt={`${project.title} landing page`}
-            width={1512}
-            height={945}
-            sizes="(max-width: 899px) 92vw, 38vw"
+          <GlassFrame
+            title={project.title}
+            image={project.image}
+            url={project.liveUrl}
+            repo={project.repo}
+            sizes="(max-width: 899px) 92vw, 42vw"
           />
         </div>
       </div>
@@ -237,15 +225,12 @@ function Panel({
         <ol className="latent-stages">
           {anatomy.stages.map((s, i) => (
             <li key={s.name} style={{ ["--i" as string]: i }}>
-              <span className="latent-mono latent-stage-n">L{i + 1}</span>
+              <span className="latent-mono latent-stage-n">{String(i + 1).padStart(2, "0")}</span>
               <b>{s.name}</b>
               <span className="latent-stage-d">{s.desc}</span>
             </li>
           ))}
         </ol>
-        <p className="latent-mono latent-fp-readout" aria-hidden>
-          <span ref={readout}>layer 0/5 · waiting for input</span>
-        </p>
       </div>
     </motion.article>
   );

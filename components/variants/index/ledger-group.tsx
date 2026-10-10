@@ -83,7 +83,7 @@ export function LedgerGroup({
             </span>
           </td>
           <td className="index-num index-t-state">
-            <span className="index-state-m">▲ Merged</span>
+            <span className="index-state-m">Merged</span>
             <span className="index-t-sub">{r.date}</span>
           </td>
         </tr>

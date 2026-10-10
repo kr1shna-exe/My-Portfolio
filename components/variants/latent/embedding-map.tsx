@@ -23,7 +23,6 @@ export function EmbeddingMap() {
   const [hover, setHover] = useState<string | null>(null);
   const [focusCluster, setFocusCluster] = useState<ClusterId | null>(null);
   const reduce = useReducedMotion();
-  const readout = useRef<HTMLSpanElement>(null);
   const btns = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const sel = POINT_BY_ID[selected];
@@ -70,30 +69,21 @@ export function EmbeddingMap() {
     if (best) pick(best.id);
   };
 
-  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - r.left) / r.width) * 2 - 1;
-    const y = 1 - ((e.clientY - r.top) / r.height) * 2;
-    if (readout.current)
-      readout.current.textContent = `(${x >= 0 ? " " : ""}${x.toFixed(2)}, ${y >= 0 ? " " : ""}${y.toFixed(2)})`;
-  };
 
   return (
-    <section id="map" className="latent-map-sec" aria-labelledby="latent-map-h" data-nav-section>
+    <section id="work" className="latent-map-sec" aria-labelledby="latent-map-h" data-nav-section>
       <div className="latent-wrap">
         <header className="latent-sec-head latent-sec-head-row" data-reveal>
           <div>
-          <p className="latent-eyebrow latent-mono">
-            <span>01</span> the work, embedded
-          </p>
+          <p className="latent-eyebrow latent-mono">Work</p>
           <h2 id="latent-map-h" className="latent-h2">
-            Everything I&apos;ve built, in <em>one latent space.</em>
+            Everything I&apos;ve built, in one map.
           </h2>
           </div>
           <div className="latent-map-side">
           <p className="latent-lede">
-            Seven products, three roles and the six projects I&apos;ve merged pull requests into, placed by what they have in
-            common. Pick a point and its nearest neighbours light up.
+            Seven products, three roles and six open-source projects, grouped by what they have in
+            common. Select any point to see what sits closest to it.
           </p>
           <div className="latent-legend" role="group" aria-label="Highlight a cluster">
             {CLUSTER_ORDER.map((id) => (
@@ -101,10 +91,10 @@ export function EmbeddingMap() {
                 key={id}
                 type="button"
                 aria-pressed={focusCluster === id}
-                className={`latent-legend-chip latent-tone-${CLUSTERS[id].tone}`}
+                className="latent-legend-chip"
                 onClick={() => setFocusCluster((c) => (c === id ? null : id))}
               >
-                <i aria-hidden /> {CLUSTERS[id].label}
+                {CLUSTERS[id].label}
               </button>
             ))}
           </div>
@@ -115,20 +105,11 @@ export function EmbeddingMap() {
           <div className="latent-map-col">
             <div
               className="latent-map"
-              onPointerMove={onMove}
               onKeyDown={onKey}
               role="group"
-              aria-label="Embedding map of projects, roles and contributions. Use arrow keys to move between points."
+              aria-label="Map of projects, roles and open-source projects. Use arrow keys to move between points."
             >
               <svg viewBox={`0 0 100 ${H}`} aria-hidden className="latent-map-svg">
-                <defs>
-                  {CLUSTER_ORDER.map((id) => (
-                    <radialGradient key={id} id={`latent-g-${id}`}>
-                      <stop offset="0%" className={`latent-stop latent-tone-${CLUSTERS[id].tone}`} stopOpacity=".55" />
-                      <stop offset="100%" className={`latent-stop latent-tone-${CLUSTERS[id].tone}`} stopOpacity="0" />
-                    </radialGradient>
-                  ))}
-                </defs>
                 {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((x) => (
                   <line key={`x${x}`} x1={x} x2={x} y1={0} y2={H} className="latent-grid-line" />
                 ))}
@@ -145,7 +126,7 @@ export function EmbeddingMap() {
                       className="latent-cluster"
                       data-dim={focusCluster && focusCluster !== id ? "1" : "0"}
                     >
-                      <ellipse cx={c.x} cy={c.y} rx={c.rx * 1.25} ry={c.ry * 1.25} fill={`url(#latent-g-${id})`} />
+                      <ellipse cx={c.x} cy={c.y} rx={c.rx} ry={c.ry} className="latent-cluster-fill" />
                       <ellipse cx={c.x} cy={c.y} rx={c.rx} ry={c.ry} className="latent-cluster-ring" />
                     </g>
                   );
@@ -156,7 +137,7 @@ export function EmbeddingMap() {
                     cx={d.x}
                     cy={d.y}
                     r={d.r * 0.55}
-                    className={`latent-dust latent-tone-${CLUSTERS[d.c].tone}`}
+                    className="latent-dust"
                     data-dim={focusCluster && focusCluster !== d.c ? "1" : "0"}
                   />
                 ))}
@@ -209,27 +190,8 @@ export function EmbeddingMap() {
                 );
               })}
 
-              {nn.map((n) => {
-                const p = POINT_BY_ID[active];
-                const q = POINT_BY_ID[n.id];
-                return (
-                  <span
-                    key={`sim-${active}-${n.id}`}
-                    aria-hidden
-                    className="latent-sim latent-mono"
-                    style={{
-                      left: `${p.x + (q.x - p.x) * 0.62}%`,
-                      top: `${((p.y + (q.y - p.y) * 0.62) / H) * 100}%`,
-                    }}
-                  >
-                    {n.sim.toFixed(2)}
-                  </span>
-                );
-              })}
-
               {POINTS.map((p) => {
                 const isSel = p.id === selected;
-                const tone = p.kind === "role" ? "ink" : CLUSTERS[p.cluster].tone;
                 const labelLeft = p.x > 74;
                 return (
                   <button
@@ -238,7 +200,7 @@ export function EmbeddingMap() {
                       btns.current[p.id] = el;
                     }}
                     type="button"
-                    className={`latent-pt latent-pt-${p.kind} latent-tone-${tone}`}
+                    className={`latent-pt latent-pt-${p.kind}`}
                     data-lit={lit.has(p.id) ? "1" : "0"}
                     data-dim={dimmed(p) ? "1" : "0"}
                     data-left={labelLeft ? "1" : "0"}
@@ -263,15 +225,11 @@ export function EmbeddingMap() {
                 );
               })}
 
-              <div className="latent-map-hud latent-mono" aria-hidden>
-                <span>dim₀ × dim₁</span>
-                <span ref={readout}>( 0.00,  0.00)</span>
-              </div>
             </div>
             <p className="latent-footnote latent-mono">
-              * Points are hand-placed, not computed. &ldquo;Similarity&rdquo; is just proximity on this
-              plane. Roles sit between the clusters their work touched; open-source dots are sized by merged PRs. Arrow keys move the
-              selection.
+              Placed by hand, not computed. Closeness is distance on this map. Roles sit between the
+              groups their work touched; open-source points are sized by merged PRs. Arrow keys move
+              the selection.
             </p>
           </div>
 
@@ -279,9 +237,9 @@ export function EmbeddingMap() {
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={selected}
-                initial={reduce ? false : { opacity: 0, y: 14, rotate: -1.2 }}
-                animate={{ opacity: 1, y: 0, rotate: 0 }}
-                exit={reduce ? { opacity: 0 } : { opacity: 0, y: -10, rotate: 0.8 }}
+                initial={reduce ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
                 transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
               >
                 <PointDetail point={sel} onPick={pick} />
@@ -296,7 +254,7 @@ export function EmbeddingMap() {
             const items = POINTS.filter((p) => p.kind !== "role" && p.cluster === id);
             return (
               <div key={id} className="latent-list-group">
-                <h3 className={`latent-tag latent-tone-${CLUSTERS[id].tone}`}>{CLUSTERS[id].label}</h3>
+                <h3 className="latent-list-h">{CLUSTERS[id].label}</h3>
                 {items.map((p) => (
                   <ListItem key={p.id} point={p} />
                 ))}
@@ -304,13 +262,13 @@ export function EmbeddingMap() {
             );
           })}
           <div className="latent-list-group">
-            <h3 className="latent-tag latent-tag-ink">Roles, between clusters</h3>
+            <h3 className="latent-list-h">Roles</h3>
             {POINTS.filter((p) => p.kind === "role").map((p) => (
               <ListItem key={p.id} point={p} />
             ))}
           </div>
           <p className="latent-footnote latent-mono">
-            * Grouping is hand-placed. Similarity is proximity on the desktop map.
+            Grouped by hand. Closeness is distance on the desktop map.
           </p>
         </div>
       </div>
@@ -327,7 +285,7 @@ function ListItem({ point }: { point: MapPoint }) {
           {point.kind === "project"
             ? point.project.tagline
             : point.kind === "role"
-              ? `${point.role.role} · ${point.role.start} → ${point.role.end}`
+              ? `${point.role.role} · ${point.role.start} – ${point.role.end}`
               : `${point.repo.prs.length} merged ${point.repo.prs.length === 1 ? "PR" : "PRs"} · ${point.repo.description}`}
         </span>
         <span className="latent-li-plus" aria-hidden>+</span>

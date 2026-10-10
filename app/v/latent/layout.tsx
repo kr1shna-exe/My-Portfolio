@@ -14,11 +14,11 @@ const azeret = Azeret_Mono({ variable: "--font-azeret", subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Krishna · Latent",
   description:
-    "Founding AI/ML engineer. My name denoises out of static and the work is laid out as an embedding map.",
+    "Founding AI/ML engineer. I build AI products end to end.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2236c8",
+  themeColor: "#0a0a0a",
 };
 
 export default function LatentLayout({ children }: { children: React.ReactNode }) {

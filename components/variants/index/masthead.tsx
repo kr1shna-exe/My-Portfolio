@@ -1,10 +1,10 @@
 import { site } from "./data";
 
 const NAV = [
-  { href: "#work", label: "Index" },
-  { href: "#features", label: "Features" },
-  { href: "#record", label: "Open source" },
-  { href: "#career", label: "Career" },
+  { href: "#work", label: "Work" },
+  { href: "#features", label: "Featured" },
+  { href: "#open-source", label: "Open source" },
+  { href: "#experience", label: "Experience" },
   { href: "#about", label: "About" },
 ];
 
@@ -12,7 +12,7 @@ export function Masthead() {
   return (
     <header className="index-mast">
       <a href="#top" className="index-mast-mark" aria-label="Krishna, back to top">
-        KRISHNA<span aria-hidden>/INDEX</span>
+        KRISHNA
       </a>
       <nav aria-label="Sections" className="index-mast-nav">
         {NAV.map((n) => (

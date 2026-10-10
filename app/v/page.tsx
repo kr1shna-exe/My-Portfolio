@@ -22,7 +22,7 @@ export default function VariantsHub() {
           Portfolio redesign · Oct 2026
         </p>
         <h1 className="mt-4 max-w-[18ch] text-[clamp(2.4rem,6vw,4.5rem)] leading-[0.95] font-[700] tracking-[-0.03em]">
-          Four directions. Pick the one that feels like you.
+          Two directions, revised from your review.
         </h1>
         <p className="mt-5 max-w-[56ch] text-white/60">
           Each one is a full page with the same real content. Use the pill at

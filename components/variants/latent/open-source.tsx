@@ -1,7 +1,6 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
-import { useState, type PointerEvent } from "react";
+import { useState } from "react";
 
 import {
   contributionStats as stats,
@@ -13,7 +12,7 @@ import {
 /* Upstream pull requests. Leads with the numbers, then the six projects as
    big sticker cards, a merge histogram, and every PR grouped by project. */
 
-const TONES = ["#2236c8", "#e8417f", "#0d9a68", "#6a4cf0", "#0e1440", "#ff7a3d"];
+const TONES = ["#0a0a0a", "#3d3c39", "#64625d", "#8b8881", "#b1aea5", "#d6d3ca"];
 const toneOf = (repo: string) =>
   TONES[Math.max(0, contributionsByRepo.findIndex((r) => r.repo === repo)) % TONES.length];
 export const repoSlug = (name: string) => `oss-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
@@ -37,17 +36,14 @@ export function OpenSource() {
       <div className="latent-wrap">
         <header className="latent-os-head" data-reveal>
           <div>
-            <p className="latent-eyebrow latent-mono">
-              <span>04</span> open source
-            </p>
-            <h2 id="latent-os-h" className="latent-h2 latent-h2-xl">
-              Gradients I&apos;ve pushed <em>upstream.</em>
+            <p className="latent-eyebrow latent-mono">Open source</p>
+            <h2 id="latent-os-h" className="latent-h2">
+              {stats.merged} pull requests merged into {stats.repos} open-source projects.
             </h2>
           </div>
           <div className="latent-os-side">
             <p className="latent-lede">
-              {stats.merged} pull requests into {nameList}. Every one of them merged, between{" "}
-              {fmt(stats.since, { month: "short", day: "numeric" })} and{" "}
+              {nameList}. All merged between {fmt(stats.since, { month: "short", day: "numeric" })} and{" "}
               {fmt(stats.latest, { month: "short", day: "numeric", year: "numeric" })}.
             </p>
           </div>
@@ -94,7 +90,7 @@ export function OpenSource() {
         </ul>
 
         <div className="latent-ledger">
-          <p className="latent-mono latent-ledger-k">every pull request, by project · newest first</p>
+          <p className="latent-mono latent-ledger-k">All pull requests</p>
           {contributionsByRepo.map((r) => (
             <RepoGroup key={r.repo} repo={r} />
           ))}
@@ -120,8 +116,13 @@ function Histogram() {
           </div>
         ))}
       </div>
-      <figcaption className="latent-mono">
-        merges per day, coloured by project
+      <figcaption className="latent-hist-legend latent-mono">
+        <span>Merged per day</span>
+        {contributionsByRepo.map((r) => (
+          <span key={r.repo}>
+            <i style={{ background: toneOf(r.repo) }} aria-hidden /> {r.name}
+          </span>
+        ))}
       </figcaption>
     </figure>
   );
@@ -130,34 +131,14 @@ function Histogram() {
 type Repo = (typeof contributionsByRepo)[number];
 
 function ProjectCard({ repo, i }: { repo: Repo; i: number }) {
-  const reduce = useReducedMotion();
   const add = repo.prs.reduce((a, c) => a + c.additions, 0);
   const del = repo.prs.reduce((a, c) => a + c.deletions, 0);
-  const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
-    if (reduce || e.pointerType === "touch") return;
-    const el = e.currentTarget;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    el.style.setProperty("--mx", `${px * 100}%`);
-    el.style.setProperty("--my", `${py * 100}%`);
-    el.style.setProperty("--ry", `${(px - 0.5) * 10}deg`);
-    el.style.setProperty("--rx", `${(0.5 - py) * 8}deg`);
-  };
-  const onLeave = (e: PointerEvent<HTMLAnchorElement>) => {
-    e.currentTarget.style.setProperty("--ry", "0deg");
-    e.currentTarget.style.setProperty("--rx", "0deg");
-  };
   return (
     <a
       href={`#${repoSlug(repo.name)}`}
-      className="latent-pr latent-osp"
-      style={{ ["--tilt" as string]: `${i % 2 ? 0.7 : -0.7}deg`, ["--tone" as string]: toneOf(repo.repo) }}
-      onPointerMove={onMove}
-      onPointerLeave={onLeave}
+      className="latent-osp"
       aria-label={`${repo.name}: ${repo.prs.length} merged pull requests. Jump to the list.`}
     >
-      <span className="latent-pr-glow" aria-hidden />
       <span className="latent-osp-top latent-mono">
         <span>{String(i + 1).padStart(2, "0")}</span>
         <span>{repo.repo}</span>
@@ -192,9 +173,7 @@ function RepoGroup({ repo }: { repo: Repo }) {
       <header className="latent-ledger-head">
         <span className="latent-ledger-dot" style={{ background: toneOf(repo.repo) }} aria-hidden />
         <h3>{repo.name}</h3>
-        <span className="latent-sticker latent-sticker-paper latent-sticker-sm">
-          {repo.prs.length} merged
-        </span>
+        <span className="latent-tag latent-tag-outline">{repo.prs.length} merged</span>
         <a className="latent-ledger-repo latent-mono" href={repo.url} target="_blank" rel="noreferrer">
           {repo.repo} ↗
         </a>

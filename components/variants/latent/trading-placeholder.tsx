@@ -18,14 +18,14 @@ const CANDLES = (() => {
 export function TradingPlaceholder() {
   return (
     <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustration of a candlestick chart: Trading Platform has no screenshot yet">
-      <rect width="160" height="100" fill="#0e1440" />
+      <rect width="160" height="100" fill="#111111" />
       {[20, 40, 60, 80].map((y) => (
         <line key={y} x1="0" x2="160" y1={y} y2={y} stroke="rgba(245,243,236,.08)" strokeWidth=".4" />
       ))}
       {CANDLES.map((k, i) => {
         const x = 8 + i * 5.2;
         const up = k.c >= k.o;
-        const col = up ? "#6fe3b5" : "#ff9fc0";
+        const col = up ? "#f5f3ec" : "#6b6964";
         const y = (n: number) => 92 - n;
         return (
           <g key={i}>
@@ -34,8 +34,8 @@ export function TradingPlaceholder() {
           </g>
         );
       })}
-      <text x="8" y="96" fill="#f5f3ec" fontSize="3.6" fontFamily="var(--font-azeret), monospace" opacity=".8">
-        TRADING PLATFORM · no screenshot yet
+      <text x="8" y="96" fill="#f5f3ec" fontSize="3.6" fontFamily="var(--font-azeret), monospace" opacity=".6">
+        No screenshot yet
       </text>
     </svg>
   );

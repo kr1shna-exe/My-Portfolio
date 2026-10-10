@@ -38,7 +38,6 @@ export function Contact() {
 
   return (
     <div className="index-contact">
-      <p className="index-contact-lede">Have something worth building? Write to me.</p>
       <a href={`mailto:${site.email}`} className="index-email" aria-label={`Email ${site.email}`}>
         <span className="index-email-l1" aria-hidden>
           <Wave text={user} />

@@ -30,7 +30,3 @@ export function formatDate(iso: string) {
 export function shortMonth(s: string) {
   return s.replace(/^([A-Z][a-z]{2})[a-z]+/, "$1");
 }
-
-export const allTech = Array.from(
-  new Set(showcase.filter((p) => !HIDE_DETAILS.has(p.slug)).flatMap((p) => p.tech))
-);
