@@ -1,5 +1,5 @@
-/* Variant "Index": Broadsheet at poster scale. Paper, ink, one signal red
-   reserved for things that are live right now. Every class is prefixed
+/* Variant "Index": Broadsheet at poster scale. Paper and ink only, no
+   accent colour. Every class is prefixed
    index- so nothing leaks to other routes. */
 
 body:has([data-variant="index"]) {
@@ -14,7 +14,6 @@ body:has([data-variant="index"]) {
   --ix-muted-inv: #aaa59a;
   --ix-line: rgba(23, 21, 15, 0.16);
   --ix-line-inv: rgba(237, 235, 231, 0.18);
-  --ix-signal: #e3361c;
   --ix-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ix-gutter: clamp(16px, 2.2vw, 32px);
   --ix-sans: var(--font-archivo), "Archivo", system-ui, sans-serif;
@@ -55,7 +54,7 @@ body:has([data-variant="index"]) {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--ix-signal);
+  background: currentColor;
   vertical-align: 0.12em;
 }
 
@@ -95,7 +94,7 @@ body:has([data-variant="index"]) {
   z-index: -1;
   background: var(--ix-ink);
   transform: scaleY(0);
-  transform-origin: bottom;
+  transform-origin: top;
   transition: transform 0.4s var(--ix-ease);
 }
 .index-btn:hover { color: var(--ix-paper); }
@@ -105,8 +104,8 @@ body:has([data-variant="index"]) {
   color: var(--ix-paper);
   border-color: var(--ix-ink);
 }
-.index-btn-ink::before { background: var(--ix-signal); }
-.index-btn-ink:hover { color: var(--ix-paper); }
+.index-btn-ink::before { background: var(--ix-paper); }
+.index-btn-ink:hover { color: var(--ix-ink); }
 .index-btn-inv::before { background: var(--ix-ink); }
 .index-sheet-ink .index-btn::before,
 .index-foot .index-btn::before { background: var(--ix-paper); }
@@ -343,6 +342,13 @@ body:has([data-variant="index"]) {
 }
 .index-inside-item:hover { color: var(--ix-paper); }
 .index-inside-item:hover::before { transform: scaleY(1); }
+/* Shared ink direction (see ink-edge.tsx): pour in from the top, drain out
+   the bottom unless the pointer enters or leaves through the other edge. */
+.index-btn[data-edge="bottom"]::before,
+.index-listing[data-edge="bottom"]::before,
+.index-more-btn[data-edge="bottom"]::before,
+.index-row[data-edge="bottom"]::before,
+.index-inside-item[data-edge="bottom"]::before { transform-origin: bottom; }
 .index-inside-thumb { width: 110px; }
 .index-inside-text { display: grid; gap: 6px; min-width: 0; }
 .index-inside-no {
@@ -520,10 +526,9 @@ body:has([data-variant="index"]) {
   background: var(--ix-ink);
   z-index: -1;
   transform: scaleY(0);
-  transform-origin: bottom;
+  transform-origin: top;
   transition: transform 0.5s var(--ix-ease);
 }
-.index-row[data-from="top"]::before { transform-origin: top; }
 .index-row-no {
   font: 400 0.8rem/1 var(--ix-mono);
   align-self: start;
@@ -1035,7 +1040,7 @@ body:has([data-variant="index"]) {
   z-index: -1;
   background: var(--ix-ink);
   transform: scaleY(0);
-  transform-origin: bottom;
+  transform-origin: top;
   transition: transform 0.45s var(--ix-ease);
 }
 .index-board > li:nth-child(3n + 1) .index-listing::before { left: calc(-1 * var(--ix-gutter)); }
@@ -1164,7 +1169,7 @@ body:has([data-variant="index"]) {
   z-index: -1;
   background: var(--ix-ink);
   transform: scaleY(0);
-  transform-origin: bottom;
+  transform-origin: top;
   transition: transform 0.4s var(--ix-ease);
 }
 .index-more-btn:hover { color: var(--ix-paper); }

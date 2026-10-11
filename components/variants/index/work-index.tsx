@@ -124,10 +124,8 @@ export function WorkIndex() {
     setActive(null);
   };
 
-  /* Ink floods in from the edge the pointer crossed. */
+  /* Ink direction is handled page-wide by InkEdge. */
   const rowEnter = (e: React.PointerEvent<HTMLLIElement>, slug: string) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.dataset.from = e.clientY < r.top + r.height / 2 ? "top" : "bottom";
     if (e.pointerType !== "touch") setActive(slug);
   };
 
@@ -149,10 +147,6 @@ export function WorkIndex() {
               data-row
               className={cn("index-row", active === p.slug && "is-active")}
               onPointerEnter={(e) => rowEnter(e, p.slug)}
-              onPointerLeave={(e) => {
-                const r = e.currentTarget.getBoundingClientRect();
-                e.currentTarget.dataset.from = e.clientY < r.top + r.height / 2 ? "top" : "bottom";
-              }}
             >
               <span className="index-row-no">{pad(i + 1)}</span>
               <div className="index-row-title">

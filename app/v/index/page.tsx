@@ -5,6 +5,7 @@ import { Contact } from "@/components/variants/index/contact";
 import { contributionStats } from "@/data/open-source";
 import { liveCount, showcase, site } from "@/components/variants/index/data";
 import { IndexHero } from "@/components/variants/index/hero";
+import { InkEdge } from "@/components/variants/index/ink-edge";
 import { SectionHead } from "@/components/variants/index/in-view";
 import { Ledger } from "@/components/variants/index/ledger";
 import { Masthead } from "@/components/variants/index/masthead";
@@ -14,6 +15,7 @@ import { WorkIndex } from "@/components/variants/index/work-index";
 export default function IndexPage() {
   return (
     <div data-variant="index" className="index-root">
+      <InkEdge />
       <Masthead />
       <main id="main">
         <IndexHero />
